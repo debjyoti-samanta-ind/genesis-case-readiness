@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-genesis-teal: #1B6B6B;
+  --color-genesis-teal-light: #D4EEEE;
+  --color-genesis-teal-bright: #2DD4BF;
+  --color-genesis-navy: #1A2F4A;
+  --color-genesis-bg: #F5F3EE;
+  --color-genesis-border: #E8E4DC;
+  --color-genesis-muted: #6B7280;
+  --color-genesis-amber: #B45309;
+  --color-genesis-amber-bg: #FEF3C7;
+  --color-genesis-red: #991B1B;
+  --color-genesis-red-bg: #FEE2E2;
+  --color-genesis-green: #166534;
+  --color-genesis-green-bg: #DCFCE7;
+  --color-genesis-blue: #1D4ED8;
+  --color-genesis-blue-bg: #EFF6FF;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: #F5F3EE;
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #1A2F4A;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: 'Syne', sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
