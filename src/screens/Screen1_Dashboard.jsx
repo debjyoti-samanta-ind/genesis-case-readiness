@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import {
   CheckCircle, AlertTriangle, Activity, TrendingUp, ArrowRight,
-  LayoutDashboard, X, ShoppingCart, FileText,
+  X, ShoppingCart, FileText,
 } from 'lucide-react';
 import { sentinelRun } from '../mockData/sentinelRun';
 import { priorityQueue } from '../mockData/priorityQueue';
 import { autoHandledItems } from '../mockData/autoHandledItems';
 
 /* ── Donut SVG ──────────────────────────────────────────────── */
-function DonutChart({ segments, size = 100 }) {
-  const r = 36, cx = size / 2, cy = size / 2;
+function DonutChart({ segments, size = 100, centerLabel = 'DECISIONS' }) {
+  const r  = Math.round(size * 0.34);
+  const sw = Math.max(8, Math.round(size * 0.115));
+  const cx = size / 2, cy = size / 2;
   const circ = 2 * Math.PI * r;
   let offset = 0;
   const total = segments.reduce((s, seg) => s + seg.value, 0);
@@ -20,7 +22,7 @@ function DonutChart({ segments, size = 100 }) {
         const gap  = circ - dash;
         const el = (
           <circle key={i} cx={cx} cy={cy} r={r} fill="none"
-            stroke={seg.color} strokeWidth={12}
+            stroke={seg.color} strokeWidth={sw}
             strokeDasharray={`${dash} ${gap}`} strokeDashoffset={-offset}
             style={{transform:'rotate(-90deg)', transformOrigin:`${cx}px ${cy}px`}}
           />
@@ -28,8 +30,8 @@ function DonutChart({ segments, size = 100 }) {
         offset += dash;
         return el;
       })}
-      <text x={cx} y={cy - 6}  textAnchor="middle" fill="#1A2F4A" fontSize="16" fontWeight="700" fontFamily="Syne,sans-serif">{total}</text>
-      <text x={cx} y={cy + 10} textAnchor="middle" fill="#6B7280" fontSize="9"  fontFamily="IBM Plex Sans,sans-serif">ITEMS</text>
+      <text x={cx} y={cy - 5}  textAnchor="middle" fill="#1A2F4A" fontSize={Math.round(size * 0.155)} fontWeight="700" fontFamily="Syne,sans-serif">{total}</text>
+      <text x={cx} y={cy + 9} textAnchor="middle" fill="#6B7280" fontSize={Math.round(size * 0.09)}  fontFamily="IBM Plex Sans,sans-serif">{centerLabel}</text>
     </svg>
   );
 }
@@ -49,7 +51,6 @@ function AutoHandledModal({ onClose }) {
     >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 flex flex-col" style={{maxHeight:'88vh'}}>
 
-        {/* Modal header */}
         <div className="flex items-start justify-between px-6 py-5 border-b border-[#E8E4DC] flex-shrink-0">
           <div>
             <div className="text-base font-bold text-[#1A2F4A]" style={{fontFamily:'Syne,sans-serif'}}>
@@ -67,10 +68,7 @@ function AutoHandledModal({ onClose }) {
           </button>
         </div>
 
-        {/* Scrollable body */}
         <div className="overflow-y-auto flex-1 px-6 py-5">
-
-          {/* Integration note */}
           <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl p-3.5 mb-6 flex items-start gap-2.5">
             <div className="w-1.5 h-1.5 rounded-full bg-[#1D4ED8] mt-1.5 flex-shrink-0" />
             <p className="text-xs text-[#1D4ED8]" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
@@ -78,7 +76,6 @@ function AutoHandledModal({ onClose }) {
             </p>
           </div>
 
-          {/* Purchase orders */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
               <ShoppingCart size={13} className="text-[#1B6B6B]" />
@@ -93,28 +90,19 @@ function AutoHandledModal({ onClose }) {
               {reorders.map(item => (
                 <div key={item.id} className="border border-[#E8E4DC] rounded-xl p-4 hover:bg-[#FAFAF8] transition-colors">
                   <div className="flex items-start gap-3">
-                    <span
-                      className="text-xs font-bold text-[#1B6B6B] bg-[#D4EEEE] px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5"
-                      style={{fontFamily:'IBM Plex Mono,monospace'}}
-                    >
+                    <span className="text-xs font-bold text-[#1B6B6B] bg-[#D4EEEE] px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5" style={{fontFamily:'IBM Plex Mono,monospace'}}>
                       {item.po}
                     </span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="text-sm font-semibold text-[#1A2F4A]" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>{item.item}</div>
-                          <div className="text-xs text-[#6B7280] mt-0.5" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
-                            {item.dept} · {item.supplier}
-                          </div>
+                          <div className="text-xs text-[#6B7280] mt-0.5" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>{item.dept} · {item.supplier}</div>
                           <div className="text-xs text-[#6B7280] mt-0.5 italic" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>{item.reason}</div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <div className="text-sm font-bold text-[#1A2F4A]" style={{fontFamily:'Syne,sans-serif'}}>
-                            {item.qty} × ${item.unitPrice.toFixed(2)}
-                          </div>
-                          <div className="text-xs font-semibold text-[#1B6B6B]" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
-                            = ${item.total.toLocaleString()}
-                          </div>
+                          <div className="text-sm font-bold text-[#1A2F4A]" style={{fontFamily:'Syne,sans-serif'}}>{item.qty} × ${item.unitPrice.toFixed(2)}</div>
+                          <div className="text-xs font-semibold text-[#1B6B6B]" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>= ${item.total.toLocaleString()}</div>
                           <div className="text-xs text-[#6B7280] mt-0.5" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>ETA {item.eta}</div>
                         </div>
                       </div>
@@ -129,7 +117,6 @@ function AutoHandledModal({ onClose }) {
             </div>
           </div>
 
-          {/* Charge gaps */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <FileText size={13} className="text-[#166534]" />
@@ -144,25 +131,18 @@ function AutoHandledModal({ onClose }) {
               {chargeGaps.map(item => (
                 <div key={item.id} className="border border-[#E8E4DC] rounded-xl p-4 hover:bg-[#FAFAF8] transition-colors">
                   <div className="flex items-start gap-3">
-                    <span
-                      className="text-xs font-bold text-[#166534] bg-[#DCFCE7] px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5"
-                      style={{fontFamily:'IBM Plex Mono,monospace'}}
-                    >
+                    <span className="text-xs font-bold text-[#166534] bg-[#DCFCE7] px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5" style={{fontFamily:'IBM Plex Mono,monospace'}}>
                       {item.po}
                     </span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="text-sm font-semibold text-[#1A2F4A]" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>{item.item}</div>
-                          <div className="text-xs text-[#6B7280] mt-0.5" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
-                            {item.dept} · {item.supplier}
-                          </div>
+                          <div className="text-xs text-[#6B7280] mt-0.5" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>{item.dept} · {item.supplier}</div>
                           <div className="text-xs text-[#6B7280] mt-0.5 italic" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>{item.reason}</div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <div className="text-sm font-bold text-[#166534]" style={{fontFamily:'Syne,sans-serif'}}>
-                            ${item.total.toLocaleString()}
-                          </div>
+                          <div className="text-sm font-bold text-[#166534]" style={{fontFamily:'Syne,sans-serif'}}>${item.total.toLocaleString()}</div>
                           <div className="text-xs text-[#6B7280] mt-0.5" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>{item.eta}</div>
                         </div>
                       </div>
@@ -178,7 +158,6 @@ function AutoHandledModal({ onClose }) {
           </div>
         </div>
 
-        {/* Modal footer */}
         <div className="px-6 py-4 border-t border-[#E8E4DC] flex items-center justify-between flex-shrink-0 bg-[#FAFAF8] rounded-b-2xl">
           <div className="text-xs text-[#6B7280]" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
             Total PO value submitted to Genesis Core:{' '}
@@ -211,7 +190,7 @@ const riskBadge = {
   info:    { bg: 'bg-[#EFF6FF]', text: 'text-[#1D4ED8]' },
 };
 
-/* ── Module health side-cards ───────────────────────────────── */
+/* ── Module cards data ──────────────────────────────────────── */
 const moduleCards = [
   {
     icon: <AlertTriangle size={14} className="text-[#991B1B]" />,
@@ -251,39 +230,8 @@ export default function Screen1_Dashboard({ navigate }) {
     { label: 'Revenue', value: 2, color: '#166534' },
   ];
 
-  const kpis = [
-    {
-      label: 'ITEMS MONITORED',
-      value: sentinelRun.totalSKUs.toLocaleString(),
-      sub: `${sentinelRun.autoHandled} auto-handled overnight`,
-      subIsLink: true,
-      icon: <LayoutDashboard size={20} className="text-[#1B6B6B]" />,
-      iconBg: 'bg-[#D4EEEE]',
-    },
-    {
-      label: 'DECISIONS PENDING',
-      value: sentinelRun.decisionsForSarah,
-      sub: 'Require your action today',
-      icon: <AlertTriangle size={20} className="text-[#991B1B]" />,
-      iconBg: 'bg-[#FEE2E2]',
-    },
-    {
-      label: 'RECOVERABLE',
-      value: `$${sentinelRun.recoverableThisWeek.toLocaleString()}`,
-      sub: '8 charge gaps · 74% confidence',
-      icon: <TrendingUp size={20} className="text-[#166534]" />,
-      iconBg: 'bg-[#DCFCE7]',
-    },
-    {
-      label: 'ACTIVE RECALLS',
-      value: sentinelRun.activeRecalls,
-      sub: '3 patients potentially exposed',
-      icon: <Activity size={20} className="text-[#B45309]" />,
-      iconBg: 'bg-[#FEF3C7]',
-    },
-  ];
-
-  const actionItems = priorityQueue.filter(i => !i.autoResolved);
+  const activeItems = priorityQueue.filter(i => !i.autoResolved);
+  const activeCount = activeItems.filter(i => !confirmed[i.id]).length;
 
   return (
     <>
@@ -291,12 +239,9 @@ export default function Screen1_Dashboard({ navigate }) {
 
       <div>
         {/* Greeting header */}
-        <div className="flex items-start justify-between mb-6 gap-4">
+        <div className="flex items-start justify-between mb-5 gap-4">
           <div>
-            <div
-              className="text-xs font-semibold uppercase tracking-widest mb-1"
-              style={{color:'#4A6B8A', fontFamily:'IBM Plex Sans,sans-serif'}}
-            >
+            <div className="text-xs font-semibold uppercase tracking-widest mb-1" style={{color:'#4A6B8A', fontFamily:'IBM Plex Sans,sans-serif'}}>
               Good morning
             </div>
             <h1 className="text-2xl font-bold text-[#1A2F4A] leading-tight" style={{fontFamily:'Syne,sans-serif'}}>
@@ -323,290 +268,232 @@ export default function Screen1_Dashboard({ navigate }) {
           </div>
         </div>
 
-        {/* KPI row */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          {kpis.map(k => (
-            <div key={k.label} className="bg-white rounded-xl border border-[#E8E4DC] shadow-sm p-4 flex items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div
-                  className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest mb-2 leading-snug"
-                  style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                >
-                  {k.label}
-                </div>
-                <div className="text-3xl font-bold text-[#1A2F4A]" style={{fontFamily:'Syne,sans-serif'}}>
-                  {k.value}
-                </div>
-                {k.subIsLink ? (
-                  <button
-                    onClick={() => setShowPanel(true)}
-                    className="text-xs text-[#1B6B6B] mt-1 hover:underline text-left leading-snug"
-                    style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                  >
-                    {k.sub} →
-                  </button>
-                ) : (
-                  <div className="text-xs text-[#6B7280] mt-1 leading-snug" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
-                    {k.sub}
-                  </div>
-                )}
+        {/* Top row: Items Monitored card + 3 module cards */}
+        <div className="grid grid-cols-4 gap-4 mb-5">
+
+          {/* Items Monitored + Donut */}
+          <div className="bg-white rounded-xl border border-[#E8E4DC] shadow-sm p-4 flex flex-col gap-3">
+            <div>
+              <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-widest mb-2" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+                ITEMS MONITORED
               </div>
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${k.iconBg}`}>
-                {k.icon}
+              <div className="text-3xl font-bold text-[#1A2F4A]" style={{fontFamily:'Syne,sans-serif'}}>
+                {sentinelRun.totalSKUs.toLocaleString()}
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Main 3-col grid */}
-        <div className="grid grid-cols-3 gap-5">
-
-          {/* Left col */}
-          <div className="col-span-1 flex flex-col gap-4">
-
-            {/* Donut */}
-            <div className="bg-white rounded-xl border border-[#E8E4DC] shadow-sm p-5">
-              <div
-                className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-4"
+              <button
+                onClick={() => setShowPanel(true)}
+                className="text-xs text-[#1B6B6B] mt-1 hover:underline text-left leading-snug"
                 style={{fontFamily:'IBM Plex Sans,sans-serif'}}
               >
-                ITEMS BY MODULE
-              </div>
-              <div className="flex items-center gap-5">
-                <DonutChart segments={donutSegments} size={100} />
-                <div className="space-y-2 flex-1 min-w-0">
-                  {donutSegments.map(s => (
-                    <div key={s.label} className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{backgroundColor:s.color}} />
-                      <span className="text-xs text-[#6B7280] truncate" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>{s.label}</span>
-                      <span className="text-xs font-bold text-[#1A2F4A] ml-auto flex-shrink-0" style={{fontFamily:'Syne,sans-serif'}}>{s.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Module health cards */}
-            {moduleCards.map(m => (
-              <button
-                key={m.label}
-                onClick={() => navigate(m.screen)}
-                className="bg-white rounded-xl border border-[#E8E4DC] shadow-sm p-4 text-left hover:shadow-md transition-all group w-full"
-                style={{borderLeftWidth:'3px', borderLeftColor:m.borderColor}}
-              >
-                <div className="flex items-center justify-between mb-2 gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="flex-shrink-0">{m.icon}</span>
-                    <span
-                      className="text-xs font-semibold text-[#1A2F4A] uppercase tracking-wide truncate"
-                      style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                    >
-                      {m.label}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <span
-                      className="text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
-                      style={{color:m.statusColor, backgroundColor:m.statusBg, fontFamily:'IBM Plex Sans,sans-serif'}}
-                    >
-                      {m.status}
-                    </span>
-                    <ArrowRight size={11} className="text-[#6B7280] group-hover:text-[#1B6B6B] transition-colors flex-shrink-0" />
-                  </div>
-                </div>
-                <ul className="space-y-1">
-                  {m.lines.map((line, i) => (
-                    <li key={i} className="text-xs text-[#6B7280] flex items-start gap-1.5" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
-                      <span className="w-1 h-1 rounded-full flex-shrink-0 mt-1.5" style={{backgroundColor:m.borderColor, opacity:0.5}} />
-                      <span>{line}</span>
-                    </li>
-                  ))}
-                </ul>
+                {sentinelRun.autoHandled} auto-handled overnight →
               </button>
-            ))}
-          </div>
-
-          {/* Right col */}
-          <div className="col-span-2 flex flex-col gap-4">
-
-            {/* Action table */}
-            <div className="bg-white rounded-xl border border-[#E8E4DC] shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E8E4DC]">
-                <div
-                  className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]"
-                  style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                >
-                  IMMEDIATE ACTION REQUIRED
-                </div>
-                <span className="text-xs font-bold text-[#991B1B] bg-[#FEE2E2] px-2.5 py-0.5 rounded-full">
-                  {actionItems.filter(i => !confirmed[i.id]).length} pending
-                </span>
-              </div>
-
-              {/* Column headers */}
-              <div
-                className="grid px-5 py-2 border-b border-[#E8E4DC] bg-[#FAFAF8] text-xs font-semibold text-[#6B7280] uppercase tracking-wide"
-                style={{gridTemplateColumns:'70px 1fr 100px 148px', fontFamily:'IBM Plex Sans,sans-serif'}}
-              >
-                <div>Module</div>
-                <div>Item · Summary</div>
-                <div>Risk</div>
-                <div>Action</div>
-              </div>
-
-              {actionItems.map(item => {
-                const isConfirmed = !!confirmed[item.id];
-                const mt = modTag[item.module] || modTag['OR READINESS'];
-                const rb = riskBadge[item.badgeVariant] || riskBadge.warning;
-
-                return (
-                  <div
-                    key={item.id}
-                    className={`grid px-5 py-3.5 border-b border-[#E8E4DC] last:border-0 items-center transition-colors ${isConfirmed ? 'bg-[#F9FFF9]' : 'hover:bg-[#FAFAF8]'}`}
-                    style={{gridTemplateColumns:'70px 1fr 100px 148px'}}
-                  >
-                    {/* Module badge */}
-                    <div>
-                      <span
-                        className={`text-xs font-semibold px-2 py-0.5 rounded-full ${mt.bg} ${mt.text}`}
-                        style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                      >
-                        {mt.short}
-                      </span>
-                    </div>
-
-                    {/* Title + summary */}
-                    <div className="pr-3 min-w-0">
-                      <div
-                        className="text-sm font-semibold text-[#1A2F4A] truncate"
-                        style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                      >
-                        {item.title}
-                      </div>
-                      <div
-                        className="text-xs text-[#6B7280] truncate mt-0.5"
-                        style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                      >
-                        {item.department} · {item.summary}
-                      </div>
-                      {isConfirmed && (
-                        <div
-                          className="text-xs text-[#166534] mt-0.5 flex items-center gap-1"
-                          style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                        >
-                          <CheckCircle size={10} className="flex-shrink-0" /> {confirmed[item.id]}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Risk badge */}
-                    <div>
-                      <span
-                        className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${rb.bg} ${rb.text}`}
-                        style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                      >
-                        {item.badge}
-                      </span>
-                    </div>
-
-                    {/* Action button */}
-                    <div>
-                      {isConfirmed ? (
-                        <div
-                          className="flex items-center gap-1.5 text-xs text-[#166534] font-medium"
-                          style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                        >
-                          <CheckCircle size={12} className="flex-shrink-0" /> Done
-                        </div>
-                      ) : item.isInline ? (
-                        <button
-                          onClick={() => confirm(item.id, item.confirmMessage)}
-                          className="text-xs font-semibold text-[#1B6B6B] border-2 border-[#1B6B6B] px-3.5 py-1.5 rounded-full hover:bg-[#1B6B6B] hover:text-white transition-colors whitespace-nowrap"
-                          style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                        >
-                          {item.cta}
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => navigate(item.ctaScreen)}
-                          className="flex items-center gap-1.5 text-xs font-semibold text-white bg-[#1B6B6B] px-3.5 py-1.5 rounded-full hover:bg-[#155555] transition-colors whitespace-nowrap"
-                          style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                        >
-                          {item.cta} <ArrowRight size={10} className="flex-shrink-0" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
             </div>
-
-            {/* Overnight pipeline */}
-            <div className="bg-white rounded-xl border border-[#E8E4DC] shadow-sm p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div
-                  className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]"
-                  style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                >
-                  OVERNIGHT AUTOMATION PIPELINE
-                </div>
-                <button
-                  onClick={() => navigate(5)}
-                  className="text-xs font-semibold text-[#1B6B6B] hover:text-[#155555] transition-colors"
-                  style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                >
-                  View agent log →
-                </button>
-              </div>
-
-              {/* Pipeline stages */}
-              <div className="flex items-center gap-1 mb-4">
-                {[
-                  { count: 847, label: 'SKUs scanned',   color: '#1A2F4A', bg: '#E8E4DC' },
-                  { count: 10,  label: 'Auto-resolved',  color: '#166534', bg: '#DCFCE7' },
-                  { count: 8,   label: 'POs placed',     color: '#1B6B6B', bg: '#D4EEEE' },
-                  { count: 2,   label: 'Gaps recovered', color: '#166534', bg: '#DCFCE7' },
-                  { count: 7,   label: 'Escalated',      color: '#B45309', bg: '#FEF3C7' },
-                ].map((stage, i, arr) => (
-                  <div key={stage.label} className="flex items-center gap-1 flex-1 min-w-0">
-                    <div className="flex-1 text-center min-w-0">
-                      <div
-                        className="text-sm font-bold mx-auto w-9 h-9 rounded-full flex items-center justify-center mb-1"
-                        style={{fontFamily:'Syne,sans-serif', color:stage.color, backgroundColor:stage.bg}}
-                      >
-                        {stage.count}
-                      </div>
-                      <div
-                        className="text-[10px] text-[#6B7280] leading-tight"
-                        style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                      >
-                        {stage.label}
-                      </div>
-                    </div>
-                    {i < arr.length - 1 && (
-                      <ArrowRight size={10} className="text-[#D0D0D0] flex-shrink-0" />
-                    )}
+            <div className="border-t border-[#E8E4DC] pt-3 flex items-center gap-3">
+              <DonutChart segments={donutSegments} size={80} centerLabel="DECISIONS" />
+              <div className="space-y-1.5 flex-1 min-w-0">
+                {donutSegments.map(s => (
+                  <div key={s.label} className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{backgroundColor:s.color}} />
+                    <span className="text-xs text-[#6B7280] flex-1 min-w-0" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>{s.label}</span>
+                    <span className="text-xs font-bold text-[#1A2F4A]" style={{fontFamily:'Syne,sans-serif'}}>{s.value}</span>
                   </div>
                 ))}
               </div>
-
-              {/* View items link */}
-              <div className="border-t border-[#E8E4DC] pt-3 flex items-center justify-between gap-3">
-                <div
-                  className="text-xs text-[#6B7280] min-w-0"
-                  style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                >
-                  8 purchase orders · 2 charge gap recoveries · Total PO value: $3,902
-                </div>
-                <button
-                  onClick={() => setShowPanel(true)}
-                  className="text-xs font-semibold text-[#1B6B6B] border-2 border-[#1B6B6B] px-3.5 py-1.5 rounded-full hover:bg-[#1B6B6B] hover:text-white transition-colors flex-shrink-0"
-                  style={{fontFamily:'IBM Plex Sans,sans-serif'}}
-                >
-                  View 10 items →
-                </button>
-              </div>
             </div>
+          </div>
+
+          {/* 3 module cards */}
+          {moduleCards.map(m => (
+            <button
+              key={m.label}
+              onClick={() => navigate(m.screen)}
+              className="bg-white rounded-xl border border-[#E8E4DC] shadow-sm p-4 text-left hover:shadow-md transition-all group w-full"
+              style={{borderLeftWidth:'3px', borderLeftColor:m.borderColor}}
+            >
+              <div className="flex items-center justify-between mb-2.5 gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="flex-shrink-0">{m.icon}</span>
+                  <span className="text-xs font-semibold text-[#1A2F4A] uppercase tracking-wide truncate" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+                    {m.label}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <span
+                    className="text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
+                    style={{color:m.statusColor, backgroundColor:m.statusBg, fontFamily:'IBM Plex Sans,sans-serif'}}
+                  >
+                    {m.status}
+                  </span>
+                  <ArrowRight size={11} className="text-[#6B7280] group-hover:text-[#1B6B6B] transition-colors flex-shrink-0" />
+                </div>
+              </div>
+              <ul className="space-y-1.5">
+                {m.lines.map((line, i) => (
+                  <li key={i} className="text-xs text-[#6B7280] flex items-start gap-1.5" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+                    <span className="w-1 h-1 rounded-full flex-shrink-0 mt-1.5" style={{backgroundColor:m.borderColor, opacity:0.5}} />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            </button>
+          ))}
+        </div>
+
+        {/* Action table — full width, all 7 items */}
+        <div className="bg-white rounded-xl border border-[#E8E4DC] shadow-sm overflow-hidden mb-5">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E8E4DC]">
+            <div className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+              ESCALATED DECISIONS
+            </div>
+            <span className="text-xs font-bold text-[#991B1B] bg-[#FEE2E2] px-2.5 py-0.5 rounded-full" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+              {activeCount} pending
+            </span>
+          </div>
+
+          <div
+            className="grid px-5 py-2 border-b border-[#E8E4DC] bg-[#FAFAF8] text-xs font-semibold text-[#6B7280] uppercase tracking-wide"
+            style={{gridTemplateColumns:'70px 1fr 110px 160px', fontFamily:'IBM Plex Sans,sans-serif'}}
+          >
+            <div>Module</div>
+            <div>Item · Summary</div>
+            <div>Risk</div>
+            <div>Action</div>
+          </div>
+
+          {activeItems.map(item => {
+            const isConfirmed  = !!confirmed[item.id];
+            const isAuto       = item.autoResolved;
+            const mt           = modTag[item.module] || modTag['OR READINESS'];
+            const rb           = riskBadge[item.badgeVariant] || riskBadge.warning;
+
+            return (
+              <div
+                key={item.id}
+                className={`grid px-5 py-3.5 border-b border-[#E8E4DC] last:border-0 items-center transition-colors ${
+                  isConfirmed ? 'bg-[#F9FFF9]' : 'hover:bg-[#FAFAF8]'
+                }`}
+                style={{gridTemplateColumns:'70px 1fr 110px 160px'}}
+              >
+                {/* Module badge */}
+                <div>
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${mt.bg} ${mt.text}`}
+                    style={{fontFamily:'IBM Plex Sans,sans-serif'}}
+                  >
+                    {mt.short}
+                  </span>
+                </div>
+
+                {/* Title + summary */}
+                <div className="pr-3 min-w-0">
+                  <div
+                    className="text-sm font-semibold truncate text-[#1A2F4A]"
+                    style={{fontFamily:'IBM Plex Sans,sans-serif'}}
+                  >
+                    {item.title}
+                  </div>
+                  <div className="text-xs text-[#6B7280] truncate mt-0.5" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+                    {item.department} · {item.summary}
+                  </div>
+                  {isConfirmed && (
+                    <div className="text-xs text-[#166534] mt-0.5 flex items-center gap-1" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+                      <CheckCircle size={10} className="flex-shrink-0" /> {confirmed[item.id]}
+                    </div>
+                  )}
+                </div>
+
+                {/* Risk badge */}
+                <div>
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${rb.bg} ${rb.text}`}
+                    style={{fontFamily:'IBM Plex Sans,sans-serif'}}
+                  >
+                    {item.badge}
+                  </span>
+                </div>
+
+                {/* Action */}
+                <div>
+                  {isConfirmed ? (
+                    <div className="flex items-center gap-1.5 text-xs text-[#166534] font-medium" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+                      <CheckCircle size={12} className="flex-shrink-0" /> Done
+                    </div>
+                  ) : item.isInline ? (
+                    <button
+                      onClick={() => confirm(item.id, item.confirmMessage)}
+                      className="text-xs font-semibold text-[#1B6B6B] border-2 border-[#1B6B6B] px-3.5 py-1.5 rounded-full hover:bg-[#1B6B6B] hover:text-white transition-colors whitespace-nowrap"
+                      style={{fontFamily:'IBM Plex Sans,sans-serif'}}
+                    >
+                      {item.cta}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => navigate(item.ctaScreen)}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-white bg-[#1B6B6B] px-3.5 py-1.5 rounded-full hover:bg-[#155555] transition-colors whitespace-nowrap"
+                      style={{fontFamily:'IBM Plex Sans,sans-serif'}}
+                    >
+                      {item.cta} <ArrowRight size={10} className="flex-shrink-0" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Overnight pipeline — full width */}
+        <div className="bg-white rounded-xl border border-[#E8E4DC] shadow-sm p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+              OVERNIGHT AUTOMATION PIPELINE
+            </div>
+            <button
+              onClick={() => navigate(5)}
+              className="text-xs font-semibold text-[#1B6B6B] hover:text-[#155555] transition-colors"
+              style={{fontFamily:'IBM Plex Sans,sans-serif'}}
+            >
+              View agent log →
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1 mb-4">
+            {[
+              { count: 847, label: 'SKUs scanned',   color: '#1A2F4A', bg: '#E8E4DC' },
+              { count: 10,  label: 'Auto-resolved',  color: '#166534', bg: '#DCFCE7' },
+              { count: 8,   label: 'POs placed',     color: '#1B6B6B', bg: '#D4EEEE' },
+              { count: 2,   label: 'Gaps recovered', color: '#166534', bg: '#DCFCE7' },
+              { count: 7,   label: 'Escalated',      color: '#B45309', bg: '#FEF3C7' },
+            ].map((stage, i, arr) => (
+              <div key={stage.label} className="flex items-center gap-1 flex-1 min-w-0">
+                <div className="flex-1 text-center min-w-0">
+                  <div
+                    className="text-sm font-bold mx-auto w-9 h-9 rounded-full flex items-center justify-center mb-1"
+                    style={{fontFamily:'Syne,sans-serif', color:stage.color, backgroundColor:stage.bg}}
+                  >
+                    {stage.count}
+                  </div>
+                  <div className="text-[10px] text-[#6B7280] leading-tight" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+                    {stage.label}
+                  </div>
+                </div>
+                {i < arr.length - 1 && (
+                  <ArrowRight size={10} className="text-[#D0D0D0] flex-shrink-0" />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-[#E8E4DC] pt-3 flex items-center justify-between gap-3">
+            <div className="text-xs text-[#6B7280] min-w-0" style={{fontFamily:'IBM Plex Sans,sans-serif'}}>
+              8 purchase orders · 2 charge gap recoveries · Total PO value: $3,902
+            </div>
+            <button
+              onClick={() => setShowPanel(true)}
+              className="text-xs font-semibold text-[#1B6B6B] border-2 border-[#1B6B6B] px-3.5 py-1.5 rounded-full hover:bg-[#1B6B6B] hover:text-white transition-colors flex-shrink-0"
+              style={{fontFamily:'IBM Plex Sans,sans-serif'}}
+            >
+              View 10 items →
+            </button>
           </div>
         </div>
       </div>
