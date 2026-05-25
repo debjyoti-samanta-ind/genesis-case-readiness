@@ -397,12 +397,17 @@ export const weeklyOutcomes = {
     casesCleared: 11,
     casesClearedPct: 79,
     autoResolutionRate: 73,            // % of detected gaps resolved autonomously
-    autoResolutionRatePriorWeek: 67,   // for delta
-    delayMinutesAvoided: 185,
-    delayMinutesAvoidedPriorWeek: 140,
-    estimatedLaborSavingsWeek: 4420,   // $: auto-resolved gaps × 45min × $65/OR-min proxy
-    estimatedAnnualisedSavings: 229840,
+    autoResolutionRatePriorWeek: 67,   // for delta calculation
+    totalGapsDetected: 21,             // all gaps across all cases this week
+    totalGapsAutoResolved: 15,         // resolved without human action
+    totalGapsEscalated: 6,             // required human decision
     varianceItemsFlagged: 8,
+
+    // DO NOT DISPLAY IN UI — retained for internal reference only
+    // These require a validated cost methodology from a design partner before surfacing
+    // estimatedLaborSavingsWeek: REMOVED
+    // estimatedAnnualisedSavings: REMOVED
+    // delayMinutesAvoided: REMOVED — cannot be confirmed without baseline data
   },
   dailyBreakdown: [
     { day: "Mon 25", casesScheduled: 3, casesCleared: 3, atRisk: 0, autoResolved: 4, escalated: 0 },

@@ -69,14 +69,15 @@ Open the app. The Outcomes view loads first.
 
 Point to the four metric cards:
 - "79% of this week's cases reached the OR with zero unresolved gaps."
-- "185 delay minutes avoided — at $65 per OR minute, that's $12,000 this week."
-- "73% of detected gaps were auto-resolved overnight with no human involvement."
-- "Annualised savings estimate at current run rate: $229,000."
+- "73% of detected gaps were resolved automatically overnight — no human involved."
+- "15 gaps auto-resolved this week. 6 escalated to the Perioperative Leader."
+- "8 post-case variance items flagged — items used that weren't on the preference card, or on the card but not used."
 
 Point to the surgeon variance table:
 - "Dr. Chen has 2.1 average variance items per case. His preference card says 42mm tibial component. He's actually using 44mm in 8 of his last 12 cases. The agent surfaces this — the SC Director can now have an informed conversation with Dr. Chen about updating the card."
 
-> "This is what outcome-based pricing looks like. We're not charging per seat. We're charging per delay minute avoided. The hospital knows exactly what they're getting."
+Point to the conversation starter banner:
+- "We're not showing estimated savings numbers. We don't have a validated baseline yet — that comes from the design partner in Week 3. What we're showing is what the agent observably did: cases cleared, gaps resolved, variances caught. The VP applies their own cost figures. A number they calculate themselves is worth more than one we give them."
 
 ---
 
@@ -157,6 +158,8 @@ Run this the day before Demo Day. All boxes must be checked.
 
 ```
 □ Outcomes view loads with correct weekly metrics (numbers match SYNTHETIC_DATASET.md)
+□ Outcomes view shows NO dollar estimates, NO annualised savings, NO cost-per-minute figures
+□ Outcomes conversation starter banner shows only factual operational metrics
 □ Today's OR loads with 3 cases: 1 AT RISK, 1 WATCH, 1 CLEAR
 □ Case 1 (TKA) checkpoint timeline shows T-72h COMPLETED, T-48h ACTIVE, T-24h/T-4h PENDING
 □ PPI escalation is visible and correctly labelled — no substitute recommendation shown

@@ -141,9 +141,13 @@ The business case view. Shows whether the agent is working. Updated weekly. Used
 | Metric | Definition | Source |
 |--------|-----------|--------|
 | Cases Cleared | Cases that reached T-0 with no unresolved gaps | Agent run log |
-| Delay Minutes Avoided | Estimated delay minutes prevented by agent auto-resolution | Baseline: 45 min avg delay per supply gap × gaps resolved |
-| Auto-Resolution Rate | % of agent-detected gaps resolved autonomously without human action | Agent action log |
+| Gaps Auto-Resolved | Total gaps the agent handled without human action this week | Agent action log |
+| Auto-Resolution Rate | % of detected gaps resolved autonomously | Agent action log |
 | Variance Items Flagged | Post-case items on card not used + used not on card (week total) | Post-case reconciliation |
+
+**Do not show:** estimated savings, annualised cost figures, or any dollar-denominated metric.
+These require a validated baseline methodology that has not been established with a design partner.
+Show only what the agent observably did — not what it might have saved.
 
 ### Weekly trend charts
 - Cases cleared vs at-risk per day (7-day bar chart)
@@ -155,10 +159,15 @@ The business case view. Shows whether the agent is working. Updated weekly. Used
 - Sortable by variance count
 - Click row → opens that surgeon's preference card drift detail
 
-### Outcome-based pricing anchor (bottom of view)
-- Small banner: "At current resolution rate, estimated labor savings: $X/week · $Y annualised"
-- Formula: (auto-resolved gaps × 45 min avg resolution time × $85/hr loaded cost) + (delay minutes avoided × OR minute cost $65)
-- This is the pricing model evidence — it must be visible to the VP audience
+### Conversation starter (bottom of view)
+- Small neutral banner showing only what is directly observable and factual:
+  "This week: [N] delay minutes avoided · [N]% of gaps auto-resolved · [N] same-day cancellations"
+- No dollar estimates. No annualised savings figures. No cost-per-minute assumptions.
+- Rationale: estimated savings numbers that cannot be defended with a validated methodology
+  will be challenged immediately by a VP or CFO. Showing raw operational metrics instead
+  invites the buyer to apply their own cost figures — a number they calculate themselves
+  carries far more credibility than one we provide.
+- Do NOT show: estimatedLaborSavingsWeek, estimatedAnnualisedSavings, or any derived cost figure.
 
 ---
 
