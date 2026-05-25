@@ -3,9 +3,9 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  base: '/genesis-sentinel/',
-  server: {
-    port: 5176,
-  },
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
+  base: '/genesis-case-readiness/',
 })
