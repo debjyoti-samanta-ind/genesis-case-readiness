@@ -7,10 +7,10 @@ import Outcomes from './views/Outcomes'
 import AgentLog from './views/AgentLog'
 import PostCaseReport from './views/PostCaseReport'
 
-const navItems = [
+const ALL_NAV = [
   { id: 'dashboard', label: 'Dashboard',   icon: LayoutDashboard },
-  { id: 'todaysOR',  label: "Today's OR",  icon: Activity },
-  { id: 'outcomes',  label: 'Outcomes',    icon: TrendingUp },
+  { id: 'todaysOR',  label: "Today's OR",  icon: Activity,        roles: ['periop'] },
+  { id: 'outcomes',  label: 'Outcomes',    icon: TrendingUp,      roles: ['vpsc']   },
   { id: 'agentLog',  label: 'Agent Log',   icon: ScrollText },
 ]
 
@@ -24,10 +24,17 @@ export default function App() {
     setSelectedCaseId(caseId)
   }
 
+  const handleRoleChange = (newRole) => {
+    setDashboardRole(newRole)
+    if (newRole === 'vpsc'   && (currentView === 'todaysOR' || currentView === 'postCase')) navigate('dashboard')
+    if (newRole === 'periop' && currentView === 'outcomes') navigate('dashboard')
+  }
+
+  const visibleNavItems = ALL_NAV.filter(item => !item.roles || item.roles.includes(dashboardRole))
   const activeNavId = currentView === 'postCase' ? 'todaysOR' : currentView
 
   const viewMap = {
-    dashboard: <Dashboard    navigate={navigate} role={dashboardRole} onRoleChange={setDashboardRole} />,
+    dashboard: <Dashboard    navigate={navigate} role={dashboardRole} />,
     todaysOR:  <TodaysOR     navigate={navigate} selectedCaseId={selectedCaseId} />,
     outcomes:  <Outcomes     navigate={navigate} />,
     agentLog:  <AgentLog     navigate={navigate} />,
@@ -52,13 +59,38 @@ export default function App() {
           <div className="text-xs mt-0.5 pl-4" style={{ color: '#909BA6' }}>Case Readiness</div>
         </div>
 
+        {/* Role toggle */}
+        <div className="px-3 pt-4 pb-3 border-b" style={{ borderColor: '#2a3045' }}>
+          <div className="text-xs font-semibold uppercase tracking-widest mb-2 px-2" style={{ color: '#909BA6' }}>
+            Role
+          </div>
+          <div className="rounded-lg p-1" style={{ backgroundColor: '#2a3045' }}>
+            {[
+              { id: 'periop', label: 'Perioperative Leader' },
+              { id: 'vpsc',   label: 'VP Supply Chain' },
+            ].map(r => (
+              <button
+                key={r.id}
+                onClick={() => handleRoleChange(r.id)}
+                className="w-full text-left px-3 py-2 rounded-md text-xs font-medium transition-colors"
+                style={{
+                  backgroundColor: dashboardRole === r.id ? '#81D24C' : 'transparent',
+                  color:           dashboardRole === r.id ? '#2F2D2E'  : '#909BA6',
+                }}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Nav */}
         <nav className="flex-1 px-3 py-4">
           <div className="text-xs font-semibold uppercase tracking-widest mb-3 px-2" style={{ color: '#909BA6' }}>
             Navigation
           </div>
           <ul className="space-y-0.5">
-            {navItems.map(item => {
+            {visibleNavItems.map(item => {
               const Icon = item.icon
               const active = activeNavId === item.id
               return (
@@ -85,9 +117,6 @@ export default function App() {
                   >
                     <Icon size={16} className="flex-shrink-0" />
                     {item.label}
-                    {item.id === 'todaysOR' && dashboardRole === 'periop' && currentView === 'dashboard' && (
-                      <span className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#009999' }} />
-                    )}
                   </button>
                 </li>
               )
@@ -123,7 +152,7 @@ export default function App() {
             </div>
             <div>
               <div className="text-xs font-medium text-white">{currentUser.name}</div>
-              <div className="text-xs" style={{ color: '#909BA6' }}>{currentUser.role}</div>
+              <div className="text-xs" style={{ color: '#909BA6' }}>{dashboardRole === 'periop' ? 'OR Manager' : 'VP Supply Chain'}</div>
             </div>
           </div>
         </div>

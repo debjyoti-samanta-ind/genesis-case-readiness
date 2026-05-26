@@ -5,12 +5,7 @@ import { Zap } from 'lucide-react'
 const { summary } = weeklyOutcomes
 const weeklyAutoResolved = weeklyOutcomes.dailyBreakdown.reduce((s, d) => s + d.autoResolved, 0)
 
-const ROLES = [
-  { id: 'periop', label: 'Perioperative Leader' },
-  { id: 'vpsc',   label: 'VP Supply Chain' },
-]
-
-export default function Dashboard({ navigate, role = 'periop', onRoleChange }) {
+export default function Dashboard({ navigate, role = 'periop' }) {
   const atRisk = scheduledCases.filter(c => c.status === 'AT_RISK').length
   const watch  = scheduledCases.filter(c => c.status === 'WATCH').length
   const clear  = scheduledCases.filter(c => c.status === 'CLEAR').length
@@ -36,23 +31,6 @@ export default function Dashboard({ navigate, role = 'periop', onRoleChange }) {
         >
           {isPeriop ? "Go to Today's OR →" : 'Go to Outcomes →'}
         </button>
-      </div>
-
-      {/* Role toggle */}
-      <div className="inline-flex p-1 rounded-lg mb-6" style={{ backgroundColor: '#E3E3E3' }}>
-        {ROLES.map(r => (
-          <button
-            key={r.id}
-            onClick={() => onRoleChange(r.id)}
-            className="px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
-            style={{
-              backgroundColor: role === r.id ? '#81D24C' : 'transparent',
-              color:           role === r.id ? '#2F2D2E'  : '#909BA6',
-            }}
-          >
-            {r.label}
-          </button>
-        ))}
       </div>
 
       {/* Agent status pill */}
@@ -191,7 +169,7 @@ export default function Dashboard({ navigate, role = 'periop', onRoleChange }) {
             <div>
               <p className="text-sm font-semibold text-[#2F2D2E] mb-1">Weekly Outcomes · {weeklyOutcomes.period}</p>
               <p className="text-sm text-[#909BA6]">
-                {weeklyAutoResolved} actions auto-resolved · {summary.varianceItemsFlagged} variance items · ${summary.estimatedAnnualisedSavings.toLocaleString()} annualised savings
+                {weeklyAutoResolved} actions auto-resolved · {summary.varianceItemsFlagged} variance items flagged this week
               </p>
             </div>
             <button
