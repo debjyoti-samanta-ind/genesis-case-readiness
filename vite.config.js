@@ -8,4 +8,9 @@ export default defineConfig({
     tailwindcss(),
   ],
   base: '/genesis-case-readiness/',
+  build: {
+    rollupOptions: {
+      output: { entryFileNames: 'assets/[name]-[hash]-p3.js' },
+    },
+  },
 })
