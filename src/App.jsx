@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   LayoutDashboard, Activity, TrendingUp, AlertTriangle, ScrollText,
-  CheckCircle, ChevronRight
+  CheckCircle, ChevronRight, BarChart2
 } from 'lucide-react';
 import Screen1_Dashboard from './screens/Screen1_Dashboard';
 import Screen2_ORReadiness from './screens/Screen2_ORReadiness';
@@ -9,6 +9,7 @@ import Screen3_RevenueIntegrity from './screens/Screen3_RevenueIntegrity';
 import Screen4_RecallCommand from './screens/Screen4_RecallCommand';
 import Screen5_AgentLog from './screens/Screen5_AgentLog';
 import Screen6_Confirmed from './screens/Screen6_Confirmed';
+import Outcomes from './views/Outcomes';
 
 const navItems = [
   { id: 1, label: 'Dashboard', icon: LayoutDashboard },
@@ -16,6 +17,7 @@ const navItems = [
   { id: 3, label: 'Revenue Integrity', icon: TrendingUp },
   { id: 4, label: 'Recall Command', icon: AlertTriangle },
   { id: 5, label: 'Agent Log', icon: ScrollText },
+  { id: 7, label: 'Outcomes', icon: BarChart2 },
 ];
 
 export default function App() {
@@ -35,6 +37,7 @@ export default function App() {
     4: <Screen4_RecallCommand navigate={navigate} />,
     5: <Screen5_AgentLog navigate={navigate} />,
     6: <Screen6_Confirmed navigate={navigate} approvalType={approvalType} />,
+    7: <Outcomes />,
   };
 
   return (
