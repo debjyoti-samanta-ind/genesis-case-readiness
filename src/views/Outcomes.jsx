@@ -2,7 +2,7 @@ import {
   ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
-import { TrendingUp } from 'lucide-react'
+import { TrendingUp, TrendingDown } from 'lucide-react'
 import { weeklyOutcomes } from '../data/syntheticData'
 
 const { summary, dailyBreakdown, surgeonVariance } = weeklyOutcomes
@@ -64,8 +64,8 @@ export default function Outcomes() {
       label: 'Escalations Raised',
       value: `${summary.escalationsRaised}`,
       sub:   'gaps requiring human decision',
-      delta: 'directly from agent action log',
-      kind:  'neutral',
+      delta: `−${summary.escalationsRaisedPriorWeek - summary.escalationsRaised} vs prior week`,
+      kind:  'down-good',
     },
     {
       label: 'Variance Items Flagged',
@@ -108,6 +108,14 @@ export default function Outcomes() {
                 <TrendingUp size={11} />
                 {card.delta}
               </span>
+            ) : card.kind === 'down-good' ? (
+              <span
+                className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full self-start mt-auto"
+                style={{ backgroundColor: '#daffd1', color: '#42A800' }}
+              >
+                <TrendingDown size={11} />
+                {card.delta}
+              </span>
             ) : (
               <span className="text-xs text-[#909BA6] mt-auto">{card.delta}</span>
             )}
@@ -127,6 +135,7 @@ export default function Outcomes() {
               value: summary.preferenceCardDrift,
               sub:   'cases where surgeon usage differed from current preference card',
               color: '#F18F01',
+              delta: `−${summary.preferenceCardDriftPriorWeek - summary.preferenceCardDrift} vs prior week`,
             },
             {
               label: 'PPI Items Escalated',
@@ -152,7 +161,16 @@ export default function Outcomes() {
               <p className="text-2xl font-bold leading-none mb-1" style={{ color: card.color }}>
                 {card.value}
               </p>
-              <p className="text-xs text-[#909BA6]">{card.sub}</p>
+              <p className="text-xs text-[#909BA6] mb-2">{card.sub}</p>
+              {card.delta && (
+                <span
+                  className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full self-start mt-auto"
+                  style={{ backgroundColor: '#daffd1', color: '#42A800' }}
+                >
+                  <TrendingDown size={11} />
+                  {card.delta}
+                </span>
+              )}
             </div>
           ))}
         </div>
