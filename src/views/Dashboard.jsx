@@ -1,4 +1,4 @@
-import { currentUser, agentRun, scheduledCases, weeklyOutcomes } from '../data/syntheticData'
+import { currentUser, perioperativeLeader, agentRun, scheduledCases, weeklyOutcomes } from '../data/syntheticData'
 import StatusBadge from '../components/StatusBadge'
 import { Zap } from 'lucide-react'
 
@@ -11,6 +11,7 @@ export default function Dashboard({ navigate, role = 'periop' }) {
   const clear  = scheduledCases.filter(c => c.status === 'CLEAR').length
 
   const isPeriop = role === 'periop'
+  const activeUser = isPeriop ? perioperativeLeader : currentUser
 
   return (
     <div>
@@ -18,10 +19,10 @@ export default function Dashboard({ navigate, role = 'periop' }) {
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-[#2F2D2E]">
-            Good morning, {currentUser.name}
+            Good morning, {activeUser.name}
           </h1>
           <p className="text-xs mt-1" style={{ color: '#909BA6' }}>
-            {isPeriop ? 'OR Manager view' : 'Supply Chain view'} · {currentUser.hospital} · {currentUser.date}
+            {isPeriop ? 'OR Manager view' : 'Supply Chain view'} · {activeUser.hospital} · {activeUser.date}
           </p>
         </div>
         <button

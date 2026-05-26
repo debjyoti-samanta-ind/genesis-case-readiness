@@ -21,6 +21,14 @@ export const currentUser = {
   date: "Thu 29 May 2026",
 }
 
+export const perioperativeLeader = {
+  name: "Maria Santos",
+  role: "OR Manager",
+  initials: "MS",
+  hospital: "Valley Regional Medical Center",
+  date: "Thu 29 May 2026",
+}
+
 export const agentRun = {
   lastRun: "02:00am",
   date: "Thu 29 May 2026",

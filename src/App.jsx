@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { LayoutDashboard, Activity, TrendingUp, ScrollText, CheckCircle } from 'lucide-react'
-import { currentUser, agentRun } from './data/syntheticData'
+import { currentUser, perioperativeLeader, agentRun } from './data/syntheticData'
 import Dashboard from './views/Dashboard'
 import TodaysOR from './views/TodaysOR'
 import Outcomes from './views/Outcomes'
@@ -31,6 +31,7 @@ export default function App() {
   }
 
   const visibleNavItems = ALL_NAV.filter(item => !item.roles || item.roles.includes(dashboardRole))
+  const activeUser = dashboardRole === 'periop' ? perioperativeLeader : currentUser
   const activeNavId = currentView === 'postCase' ? 'todaysOR' : currentView
 
   const viewMap = {
@@ -148,10 +149,10 @@ export default function App() {
               className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
               style={{ backgroundColor: '#095256' }}
             >
-              <span className="text-white text-xs font-bold">{currentUser.initials}</span>
+              <span className="text-white text-xs font-bold">{activeUser.initials}</span>
             </div>
             <div>
-              <div className="text-xs font-medium text-white">{currentUser.name}</div>
+              <div className="text-xs font-medium text-white">{activeUser.name}</div>
               <div className="text-xs" style={{ color: '#909BA6' }}>{dashboardRole === 'periop' ? 'OR Manager' : 'VP Supply Chain'}</div>
             </div>
           </div>
