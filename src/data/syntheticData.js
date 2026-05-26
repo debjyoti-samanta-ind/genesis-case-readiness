@@ -354,6 +354,9 @@ export const weeklyOutcomes = {
     autoResolutionRatePriorWeek: 67,
     escalationsRaised: 6,
     varianceItemsFlagged: 8,
+    preferenceCardDrift: 3,
+    ppiItemsEscalated: 2,
+    loanKitRequestsSent: 4,
   },
   dailyBreakdown: [
     { day: "Mon 25", casesScheduled: 3, casesCleared: 3, atRisk: 0, autoResolved: 4, escalated: 0 },

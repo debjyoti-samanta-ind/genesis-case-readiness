@@ -115,6 +115,49 @@ export default function Outcomes() {
         ))}
       </div>
 
+      {/* Agent activity row */}
+      <div className="mb-6">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">
+          Agent Activity This Week
+        </p>
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            {
+              label: 'Preference Card Drift Detected',
+              value: summary.preferenceCardDrift,
+              sub:   'cases where surgeon usage differed from current preference card',
+              color: '#F18F01',
+            },
+            {
+              label: 'PPI Items Escalated',
+              value: summary.ppiItemsEscalated,
+              sub:   'physician preference items flagged — auto-reorder blocked per governance',
+              color: '#CB4630',
+            },
+            {
+              label: 'Loan Kit Requests Sent',
+              value: summary.loanKitRequestsSent,
+              sub:   'vendor rep emails sent autonomously by agent',
+              color: '#009999',
+            },
+          ].map(card => (
+            <div
+              key={card.label}
+              className="rounded-xl border border-[#E3E3E3] shadow-sm p-4 flex flex-col"
+              style={{ backgroundColor: '#FCFCFC' }}
+            >
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-2">
+                {card.label}
+              </p>
+              <p className="text-2xl font-bold leading-none mb-1" style={{ color: card.color }}>
+                {card.value}
+              </p>
+              <p className="text-xs text-[#909BA6]">{card.sub}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Daily breakdown bar chart */}
       <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6 mb-6">
         <div className="mb-5">
