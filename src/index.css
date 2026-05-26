@@ -1,24 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-genesis-teal: #1B6B6B;
-  --color-genesis-teal-light: #D4EEEE;
-  --color-genesis-teal-bright: #2DD4BF;
-  --color-genesis-navy: #1A2F4A;
-  --color-genesis-bg: #F5F3EE;
-  --color-genesis-border: #E8E4DC;
-  --color-genesis-muted: #6B7280;
-  --color-genesis-amber: #B45309;
-  --color-genesis-amber-bg: #FEF3C7;
-  --color-genesis-red: #991B1B;
-  --color-genesis-red-bg: #FEE2E2;
-  --color-genesis-green: #166534;
-  --color-genesis-green-bg: #DCFCE7;
-  --color-genesis-blue: #1D4ED8;
-  --color-genesis-blue-bg: #EFF6FF;
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'IBM Plex Sans', sans-serif;
+  /* Primary brand */
+  --color-genesis-green: #81D24C;
+  --color-genesis-blue: #006FDD;
+  /* Semantic status colours */
+  --color-genesis-teal: #009999;
+  --color-genesis-teal-dark: #095256;
+  --color-genesis-teal-light: #EEFFFF;
+  --color-genesis-amber: #F18F01;
+  --color-genesis-amber-light: #FFFFD6;
+  --color-genesis-red: #CB4630;
+  --color-genesis-red-light: #F9EBEA;
+  /* Brand neutrals */
+  --color-genesis-navy: #030303;
+  --color-genesis-sidebar: #1a1f2e;
+  --color-genesis-off-white: #FCFCFC;
+  /* Supporting ramps */
+  --color-genesis-green-dark: #42A800;
+  --color-genesis-green-light: #daffd1;
+  --color-genesis-blue-dark: #2D4CC7;
+  --color-genesis-blue-light: #e4f7ff;
+  /* Grey scale */
+  --color-genesis-grey-text: #2F2D2E;
+  --color-genesis-grey-muted: #909BA6;
+  --color-genesis-grey-border: #E3E3E3;
+  /* Agent Log terminal */
+  --color-genesis-terminal: #0e1117;
+  /* Fonts */
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
 }
 
@@ -28,14 +39,14 @@
 
 body {
   margin: 0;
-  background-color: #F5F3EE;
-  font-family: 'IBM Plex Sans', sans-serif;
-  color: #1A2F4A;
+  background-color: #F5F3EF;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #2F2D2E;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3 {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 #root {
