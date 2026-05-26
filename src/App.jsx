@@ -17,6 +17,7 @@ const navItems = [
 export default function App() {
   const [currentView, setCurrentView]       = useState('dashboard')
   const [selectedCaseId, setSelectedCaseId] = useState(null)
+  const [dashboardRole, setDashboardRole]   = useState('periop')
 
   const navigate = (view, caseId = null) => {
     setCurrentView(view)
@@ -26,7 +27,7 @@ export default function App() {
   const activeNavId = currentView === 'postCase' ? 'todaysOR' : currentView
 
   const viewMap = {
-    dashboard: <Dashboard    navigate={navigate} />,
+    dashboard: <Dashboard    navigate={navigate} role={dashboardRole} onRoleChange={setDashboardRole} />,
     todaysOR:  <TodaysOR     navigate={navigate} selectedCaseId={selectedCaseId} />,
     outcomes:  <Outcomes     navigate={navigate} />,
     agentLog:  <AgentLog     navigate={navigate} />,
@@ -84,6 +85,9 @@ export default function App() {
                   >
                     <Icon size={16} className="flex-shrink-0" />
                     {item.label}
+                    {item.id === 'todaysOR' && dashboardRole === 'periop' && currentView === 'dashboard' && (
+                      <span className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#009999' }} />
+                    )}
                   </button>
                 </li>
               )
