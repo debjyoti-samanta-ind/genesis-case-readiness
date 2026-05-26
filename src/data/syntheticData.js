@@ -352,10 +352,7 @@ export const weeklyOutcomes = {
     casesClearedPct: 79,
     autoResolutionRate: 73,
     autoResolutionRatePriorWeek: 67,
-    delayMinutesAvoided: 185,
-    delayMinutesAvoidedPriorWeek: 140,
-    estimatedLaborSavingsWeek: 4420,
-    estimatedAnnualisedSavings: 229840,
+    escalationsRaised: 6,
     varianceItemsFlagged: 8,
   },
   dailyBreakdown: [

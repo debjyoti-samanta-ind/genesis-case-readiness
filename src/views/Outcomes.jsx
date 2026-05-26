@@ -2,7 +2,7 @@ import {
   ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
-import { TrendingUp, Minus } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 import { weeklyOutcomes } from '../data/syntheticData'
 
 const { summary, dailyBreakdown, surgeonVariance } = weeklyOutcomes
@@ -44,7 +44,6 @@ function VariancePill({ avg }) {
 export default function Outcomes() {
   const clearanceRate = Math.round((summary.casesCleared / summary.totalCasesScheduled) * 100)
   const autoRateDelta = summary.autoResolutionRate - summary.autoResolutionRatePriorWeek
-  const delayDelta    = summary.delayMinutesAvoided - summary.delayMinutesAvoidedPriorWeek
 
   const metricCards = [
     {
@@ -52,35 +51,28 @@ export default function Outcomes() {
       value: `${summary.casesCleared}/${summary.totalCasesScheduled}`,
       sub:   `${clearanceRate}% clearance rate`,
       delta: `+${clearanceRate - 71}% vs prior week`,
-      good:  true,
+      kind:  'good',
     },
     {
       label: 'Auto-Resolution Rate',
       value: `${summary.autoResolutionRate}%`,
-      sub:   'resolved without escalation',
+      sub:   'cases resolved without escalation',
       delta: `+${autoRateDelta}pp vs prior week`,
-      good:  true,
+      kind:  'good',
     },
     {
-      label: 'Delay Minutes Avoided',
-      value: `${summary.delayMinutesAvoided}`,
-      sub:   'estimated OR minutes saved',
-      delta: `+${delayDelta} min vs prior week`,
-      good:  true,
+      label: 'Escalations Raised',
+      value: `${summary.escalationsRaised}`,
+      sub:   'gaps requiring human decision',
+      delta: 'directly from agent action log',
+      kind:  'neutral',
     },
     {
       label: 'Variance Items Flagged',
       value: `${summary.varianceItemsFlagged}`,
       sub:   'preference card discrepancies',
       delta: 'across all surgeons this week',
-      good:  null,
-    },
-    {
-      label: 'Annualised Savings',
-      value: `$${(summary.estimatedAnnualisedSavings / 1000).toFixed(0)}k`,
-      sub:   `$${summary.estimatedLaborSavingsWeek.toLocaleString()} labor savings this week`,
-      delta: 'based on this week\'s run rate',
-      good:  true,
+      kind:  'neutral',
     },
   ]
 
@@ -95,7 +87,7 @@ export default function Outcomes() {
       </div>
 
       {/* Summary metric cards */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         {metricCards.map(card => (
           <div
             key={card.label}
@@ -108,15 +100,12 @@ export default function Outcomes() {
               {card.value}
             </p>
             <p className="text-xs text-[#909BA6] mb-3">{card.sub}</p>
-            {card.good !== null ? (
+            {card.kind === 'good' ? (
               <span
                 className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full self-start mt-auto"
-                style={{
-                  backgroundColor: card.good ? '#daffd1' : '#FFFFD6',
-                  color:           card.good ? '#42A800' : '#F18F01',
-                }}
+                style={{ backgroundColor: '#daffd1', color: '#42A800' }}
               >
-                {card.good ? <TrendingUp size={11} /> : <Minus size={11} />}
+                <TrendingUp size={11} />
                 {card.delta}
               </span>
             ) : (
