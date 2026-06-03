@@ -1,11 +1,13 @@
-import { currentUser, perioperativeLeader, agentRun, scheduledCases, weeklyOutcomes } from '../data/syntheticData'
+import { useState } from 'react'
+import { currentUser, perioperativeLeader, agentRun, scheduledCases, weeklyOutcomes, hospitalContext } from '../data/syntheticData'
 import StatusBadge from '../components/StatusBadge'
-import { Zap } from 'lucide-react'
+import { Zap, TrendingUp, TrendingDown } from 'lucide-react'
 
 const { summary } = weeklyOutcomes
 const weeklyAutoResolved = weeklyOutcomes.dailyBreakdown.reduce((s, d) => s + d.autoResolved, 0)
 
 export default function Dashboard({ navigate, role = 'periop' }) {
+  const [showSetup, setShowSetup] = useState(true)
   const atRisk = scheduledCases.filter(c => c.status === 'AT_RISK').length
   const watch  = scheduledCases.filter(c => c.status === 'WATCH').length
   const clear  = scheduledCases.filter(c => c.status === 'CLEAR').length
@@ -34,6 +36,43 @@ export default function Dashboard({ navigate, role = 'periop' }) {
         </button>
       </div>
 
+      {/* Setup Checklist (P4.2) */}
+      {showSetup && (
+        <div className="mb-6 bg-white rounded-xl border-l-4 border border-[#E3E3E3] shadow-sm" style={{ borderLeftColor: '#009999' }}>
+          <div className="px-6 py-4">
+            <div className="flex items-start justify-between gap-4 mb-1">
+              <p className="text-sm font-bold text-[#2F2D2E]">Genesis Case Readiness — Setup Checklist</p>
+              <button
+                onClick={() => setShowSetup(false)}
+                className="text-xs text-[#909BA6] hover:text-[#2F2D2E] flex-shrink-0 transition-colors"
+              >
+                Dismiss ✕
+              </button>
+            </div>
+            <p className="text-xs text-[#909BA6] mb-4">
+              {hospitalContext.name} · Instance {hospitalContext.genesisInstance} · Connected 25 May 2026
+            </p>
+            <div className="space-y-2">
+              {[
+                'Epic/Cloverleaf OR schedule feed — Active',
+                'Surgeon preference cards imported — 12 surgeons · 847 SKUs indexed',
+                'Genesis Inventory module connected — real-time stock levels',
+                'Genesis PoC scan data — last 30 days ingested',
+                'Agent schedule configured — daily 02:00am · alerting enabled',
+              ].map(item => (
+                <div key={item} className="flex items-center gap-2 text-xs">
+                  <span style={{ color: '#42A800' }}>✅</span>
+                  <span className="text-[#2F2D2E]">{item}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs mt-3" style={{ color: '#909BA6' }}>
+              All 5 connections active. Agent is fully operational. This checklist is shown to new users and can be re-accessed from Settings.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Agent status pill */}
       <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-[#E3E3E3] shadow-sm mb-8">
         <Zap size={14} style={{ color: '#81D24C' }} />
@@ -48,7 +87,7 @@ export default function Dashboard({ navigate, role = 'periop' }) {
       {isPeriop ? (
         <>
           {/* Periop: 3 summary cards */}
-          <div className="grid grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">
               <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">Cases Today</p>
               <p className="text-4xl font-bold text-[#2F2D2E] mb-3">{scheduledCases.length}</p>
@@ -155,29 +194,39 @@ export default function Dashboard({ navigate, role = 'periop' }) {
           </div>
 
           {/* VP Supply Chain: 4 metric cards */}
-          <div className="grid grid-cols-4 gap-5 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
             <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">
               <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">Cases Cleared</p>
               <p className="text-4xl font-bold text-[#2F2D2E] mb-1">{summary.casesCleared}/{summary.totalCasesScheduled}</p>
-              <p className="text-sm font-medium" style={{ color: '#81D24C' }}>{summary.casesClearedPct}% cleared this week</p>
+              <p className="text-sm font-medium mb-3" style={{ color: '#81D24C' }}>{summary.casesClearedPct}% cleared this week</p>
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#daffd1', color: '#42A800' }}>
+                <TrendingUp size={11} />↑ +8pp vs prior week
+              </span>
             </div>
 
             <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">
               <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">Auto-Resolution</p>
               <p className="text-4xl font-bold mb-1" style={{ color: '#009999' }}>{summary.autoResolutionRate}%</p>
-              <p className="text-sm text-[#909BA6]">↑ from {summary.autoResolutionRatePriorWeek}% prior week</p>
+              <p className="text-sm text-[#909BA6] mb-3">from {summary.autoResolutionRatePriorWeek}% prior week</p>
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#daffd1', color: '#42A800' }}>
+                <TrendingUp size={11} />↑ +{summary.autoResolutionRate - summary.autoResolutionRatePriorWeek}pp vs prior week
+              </span>
             </div>
 
             <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">
               <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">Escalations Raised</p>
               <p className="text-4xl font-bold mb-1" style={{ color: '#F18F01' }}>{summary.escalationsRaised}</p>
-              <p className="text-sm text-[#909BA6]">gaps requiring human decision this week</p>
+              <p className="text-sm text-[#909BA6] mb-3">gaps requiring human decision this week</p>
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#daffd1', color: '#42A800' }}>
+                <TrendingDown size={11} />↓ −{summary.escalationsRaisedPriorWeek - summary.escalationsRaised} vs prior week
+              </span>
             </div>
 
             <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">
               <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">Variance Items</p>
               <p className="text-4xl font-bold mb-1" style={{ color: '#F18F01' }}>{summary.varianceItemsFlagged}</p>
-              <p className="text-sm text-[#909BA6]">flagged this week</p>
+              <p className="text-sm text-[#909BA6] mb-3">flagged this week</p>
+              <span className="text-xs text-[#909BA6]">Week 1 of 5 tracked</span>
             </div>
           </div>
 

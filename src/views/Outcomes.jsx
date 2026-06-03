@@ -3,8 +3,8 @@ import {
   ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
-import { TrendingUp, TrendingDown, ArrowUpDown, Info, Download } from 'lucide-react'
-import { weeklyOutcomes } from '../data/syntheticData'
+import { TrendingUp, TrendingDown, ArrowUpDown, ArrowUp, ArrowDown, Info, Download, ChevronDown } from 'lucide-react'
+import { weeklyOutcomes, samplePostCaseReport } from '../data/syntheticData'
 
 const { summary, dailyBreakdown, surgeonVariance } = weeklyOutcomes
 
@@ -56,14 +56,31 @@ function exportCSV(data, period) {
 }
 
 export default function Outcomes() {
-  const [sortAsc, setSortAsc] = useState(false)
+  const [sortConfig, setSortConfig] = useState({ key: 'avgVarianceItems', dir: 'desc' })
+  const [expandedCard, setExpandedCard] = useState(null)
+  const [selectedPeriod, setSelectedPeriod] = useState('thisWeek')
 
   const clearanceRate = Math.round((summary.casesCleared / summary.totalCasesScheduled) * 100)
   const autoRateDelta = summary.autoResolutionRate - summary.autoResolutionRatePriorWeek
 
-  const sortedVariance = [...surgeonVariance].sort((a, b) =>
-    sortAsc ? a.avgVarianceItems - b.avgVarianceItems : b.avgVarianceItems - a.avgVarianceItems
-  )
+  const handleSort = (key) => {
+    setSortConfig(prev => prev.key === key
+      ? { key, dir: prev.dir === 'desc' ? 'asc' : 'desc' }
+      : { key, dir: 'desc' }
+    )
+  }
+
+  const sortedVariance = [...surgeonVariance].sort((a, b) => {
+    const mul = sortConfig.dir === 'asc' ? 1 : -1
+    if (sortConfig.key === 'surgeon') return mul * a.surgeon.localeCompare(b.surgeon)
+    if (sortConfig.key === 'casesThisWeek') return mul * (a.casesThisWeek - b.casesThisWeek)
+    return mul * (a.avgVarianceItems - b.avgVarianceItems)
+  })
+
+  function SortIcon({ colKey }) {
+    if (sortConfig.key !== colKey) return <ArrowUpDown size={12} />
+    return sortConfig.dir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />
+  }
 
   const metricCards = [
     {
@@ -106,14 +123,37 @@ export default function Outcomes() {
             {weeklyOutcomes.period} · Valley Regional Medical Center
           </p>
         </div>
-        <button
-          className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-80 mt-1"
-          style={{ backgroundColor: '#006FDD', color: '#ffffff' }}
-          onClick={() => exportCSV(sortedVariance, weeklyOutcomes.period)}
-        >
-          <Download size={14} />
-          Export CSV
-        </button>
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Date range toggle (P3.2) */}
+          <div className="flex rounded-lg overflow-hidden border border-[#E3E3E3]">
+            {[
+              { id: 'thisWeek', label: 'This Week' },
+              { id: 'lastWeek', label: 'Last Week' },
+              { id: 'last30',  label: 'Last 30 Days' },
+            ].map((p, i) => (
+              <button
+                key={p.id}
+                onClick={() => setSelectedPeriod(p.id)}
+                className="px-3 py-1.5 text-xs font-medium transition-colors"
+                style={{
+                  backgroundColor: selectedPeriod === p.id ? '#095256' : '#ffffff',
+                  color: selectedPeriod === p.id ? '#ffffff' : '#909BA6',
+                  borderLeft: i > 0 ? '1px solid #E3E3E3' : 'none',
+                }}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <button
+            className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-80"
+            style={{ backgroundColor: '#006FDD', color: '#ffffff' }}
+            onClick={() => exportCSV(sortedVariance, weeklyOutcomes.period)}
+          >
+            <Download size={14} />
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {/* Summary metric cards */}

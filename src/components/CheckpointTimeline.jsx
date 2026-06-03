@@ -31,6 +31,9 @@ export default function CheckpointTimeline({
   detectedGaps, vendorReps, preferenceCards,
 }) {
   const [expandedAccordions, setExpandedAccordions] = useState(new Set())
+  const [awaitingConfirm, setAwaitingConfirm] = useState(new Set())
+  const [pendingNote, setPendingNote] = useState({})
+  const [savedNotes, setSavedNotes] = useState({})
 
   const toggleAccordion = (key) => {
     setExpandedAccordions(prev => {
@@ -212,13 +215,47 @@ export default function CheckpointTimeline({
                       {/* Action button or status indicator */}
                       {hasVendorDetail ? (
                         isActioned ? (
-                          <div className="flex items-center gap-1.5">
-                            <CheckCircle size={15} style={{ color: '#81D24C' }} />
-                            <span className="text-sm font-semibold" style={{ color: '#42A800' }}>Actioned ✓</span>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <CheckCircle size={15} style={{ color: '#81D24C' }} />
+                              <span className="text-sm font-semibold" style={{ color: '#42A800' }}>Actioned ✓</span>
+                            </div>
+                            {savedNotes[esc.id] && (
+                              <p className="text-xs mt-1.5 text-[#545F66] italic">"{savedNotes[esc.id]}"</p>
+                            )}
+                          </div>
+                        ) : awaitingConfirm.has(esc.id) ? (
+                          <div className="space-y-2">
+                            <textarea
+                              rows={3}
+                              value={pendingNote[esc.id] || ''}
+                              onChange={e => setPendingNote(prev => ({ ...prev, [esc.id]: e.target.value }))}
+                              placeholder="What did you do? (e.g. Called vendor rep, confirmed 7am delivery)"
+                              className="w-full text-xs border border-[#E3E3E3] rounded-lg px-3 py-2 text-[#2F2D2E] resize-none focus:outline-none focus:border-[#009999]"
+                            />
+                            <div className="flex items-center gap-3">
+                              <button
+                                onClick={() => {
+                                  setSavedNotes(prev => ({ ...prev, [esc.id]: pendingNote[esc.id] || '' }))
+                                  setAwaitingConfirm(prev => { const n = new Set(prev); n.delete(esc.id); return n })
+                                  onAction(esc.id)
+                                }}
+                                className="px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
+                                style={{ backgroundColor: '#81D24C', color: '#030303' }}
+                              >
+                                Confirm action
+                              </button>
+                              <button
+                                onClick={() => setAwaitingConfirm(prev => { const n = new Set(prev); n.delete(esc.id); return n })}
+                                className="text-xs text-[#909BA6] hover:text-[#2F2D2E] transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
                           </div>
                         ) : (
                           <button
-                            onClick={() => onAction(esc.id)}
+                            onClick={() => setAwaitingConfirm(prev => new Set([...prev, esc.id]))}
                             className="px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
                             style={{ backgroundColor: '#81D24C', color: '#030303' }}
                           >
