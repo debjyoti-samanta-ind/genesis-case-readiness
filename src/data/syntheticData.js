@@ -18,7 +18,7 @@ export const currentUser = {
   role: "VP Supply Chain",
   initials: "SC",
   hospital: "Valley Regional Medical Center",
-  date: "Thu 29 May 2026",
+  date: "Fri 29 May 2026",
 }
 
 export const perioperativeLeader = {
@@ -26,12 +26,12 @@ export const perioperativeLeader = {
   role: "OR Manager",
   initials: "MS",
   hospital: "Valley Regional Medical Center",
-  date: "Thu 29 May 2026",
+  date: "Fri 29 May 2026",
 }
 
 export const agentRun = {
   lastRun: "02:00am",
-  date: "Thu 29 May 2026",
+  date: "Fri 29 May 2026",
   totalSKUsMonitored: 847,
   runDurationSeconds: 21,
   autoHandledOvernight: 3,
@@ -243,7 +243,7 @@ export const checkpointStates = {
       status: "COMPLETED",
       completedAt: "2026-05-27T02:00:00",
       autoResolved: [
-        { action: "OR schedule pulled", detail: "3 cases confirmed for Thu 29 May" },
+        { action: "OR schedule pulled", detail: "3 cases confirmed for Fri 29 May" },
         { action: "Preference card pulled", detail: "PC-CHEN-TKA-001 v4.2 — 14 items" },
         { action: "Inventory check completed", detail: "11 items confirmed · 3 gaps detected" },
         { action: "BoneFix-2 auto-reordered", detail: "1 unit · $180 · PO-2026-4422 raised" },
@@ -311,6 +311,9 @@ export const checkpointStates = {
           recommendedAction: "Auto-reorder staged for approval — 2 units · $340 total. Approve to proceed.",
           riskLevel: "MEDIUM",
           resolved: false,
+          approvalNote: "STANDARD_REORDER",
+          approvalAmount: "$340",
+          approvalDetail: "2 units · Femoral Head 36mm · Stryker Orthopaedics",
         }
       ]
     },
@@ -345,7 +348,7 @@ export const checkpointStates = {
 }
 
 export const weeklyOutcomes = {
-  period: "Mon 25 May – Thu 29 May 2026",
+  period: "Mon 25 May – Fri 29 May 2026",
   summary: {
     totalCasesScheduled: 14,
     casesCleared: 11,
@@ -442,7 +445,7 @@ export const samplePostCaseReport = {
 export const agentLogEntries = [
   { time: "02:00:01", type: "INFO",     text: "Agent run started — 3 cases in 72h window · Valley Regional Medical Center" },
   { time: "02:00:02", type: "INFO",     text: "Connecting to data sources..." },
-  { time: "02:00:02", type: "SUCCESS",  text: "→ Genesis OR Schedule: ✓ (3 cases, Thu 29 May — via Epic/Cloverleaf)" },
+  { time: "02:00:02", type: "SUCCESS",  text: "→ Genesis OR Schedule: ✓ (3 cases, Fri 29 May — via Epic/Cloverleaf)" },
   { time: "02:00:02", type: "SUCCESS",  text: "→ Genesis Inventory: ✓ (real-time · 847 SKUs monitored)" },
   { time: "02:00:02", type: "SUCCESS",  text: "→ Genesis Preference Cards: ✓ (Epic/Cloverleaf feed active)" },
   { time: "02:00:02", type: "SUCCESS",  text: "→ Genesis PoC Scan Data: ✓ (UDI scans · last 30 days)" },

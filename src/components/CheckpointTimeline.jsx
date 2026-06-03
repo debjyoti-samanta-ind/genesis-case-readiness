@@ -130,7 +130,8 @@ export default function CheckpointTimeline({
               {cp.escalations.map(esc => {
                 const isActioned = actionedEscalations.has(esc.id)
                 const hasVendorDetail = esc.mvpNote !== undefined
-                const badgeStatus = hasVendorDetail ? 'ESCALATED' : 'PPI'
+                const hasApproval = esc.approvalNote !== undefined
+                const badgeStatus = hasVendorDetail ? 'ESCALATED' : hasApproval ? 'WATCH' : 'PPI'
 
                 return (
                   <div
@@ -212,61 +213,78 @@ export default function CheckpointTimeline({
                         </div>
                       )}
 
-                      {/* Action button or status indicator */}
-                      {hasVendorDetail ? (
-                        isActioned ? (
-                          <div>
-                            <div className="flex items-center gap-1.5">
-                              <CheckCircle size={15} style={{ color: '#81D24C' }} />
-                              <span className="text-sm font-semibold" style={{ color: '#42A800' }}>Actioned ✓</span>
-                            </div>
-                            {savedNotes[esc.id] && (
-                              <p className="text-xs mt-1.5 text-[#545F66] italic">"{savedNotes[esc.id]}"</p>
-                            )}
+                      {/* Action button or status indicator — three branches */}
+                      {isActioned ? (
+                        /* Actioned state (shared by vendor follow-up and standard approval) */
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <CheckCircle size={15} style={{ color: '#81D24C' }} />
+                            <span className="text-sm font-semibold" style={{ color: '#42A800' }}>Actioned ✓</span>
                           </div>
-                        ) : awaitingConfirm.has(esc.id) ? (
-                          <div className="space-y-2">
-                            <textarea
-                              rows={3}
-                              value={pendingNote[esc.id] || ''}
-                              onChange={e => setPendingNote(prev => ({ ...prev, [esc.id]: e.target.value }))}
-                              placeholder="What did you do? (e.g. Called vendor rep, confirmed 7am delivery)"
-                              className="w-full text-xs border border-[#E3E3E3] rounded-lg px-3 py-2 text-[#2F2D2E] resize-none focus:outline-none focus:border-[#009999]"
-                            />
-                            <div className="flex items-center gap-3">
-                              <button
-                                onClick={() => {
-                                  setSavedNotes(prev => ({ ...prev, [esc.id]: pendingNote[esc.id] || '' }))
-                                  setAwaitingConfirm(prev => { const n = new Set(prev); n.delete(esc.id); return n })
-                                  onAction(esc.id)
-                                }}
-                                className="px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
-                                style={{ backgroundColor: '#81D24C', color: '#030303' }}
-                              >
-                                Confirm action
-                              </button>
-                              <button
-                                onClick={() => setAwaitingConfirm(prev => { const n = new Set(prev); n.delete(esc.id); return n })}
-                                className="text-xs text-[#909BA6] hover:text-[#2F2D2E] transition-colors"
-                              >
-                                Cancel
-                              </button>
-                            </div>
+                          {savedNotes[esc.id] && (
+                            <p className="text-xs mt-1.5 text-[#545F66] italic">"{savedNotes[esc.id]}"</p>
+                          )}
+                        </div>
+                      ) : awaitingConfirm.has(esc.id) ? (
+                        /* Note field shown for both actionable escalation types */
+                        <div className="space-y-2">
+                          <textarea
+                            rows={3}
+                            value={pendingNote[esc.id] || ''}
+                            onChange={e => setPendingNote(prev => ({ ...prev, [esc.id]: e.target.value }))}
+                            placeholder={hasApproval ? 'Approval notes (optional)' : 'What did you do? (e.g. Called vendor rep, confirmed 7am delivery)'}
+                            className="w-full text-xs border border-[#E3E3E3] rounded-lg px-3 py-2 text-[#2F2D2E] resize-none focus:outline-none focus:border-[#009999]"
+                          />
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => {
+                                setSavedNotes(prev => ({ ...prev, [esc.id]: pendingNote[esc.id] || '' }))
+                                setAwaitingConfirm(prev => { const n = new Set(prev); n.delete(esc.id); return n })
+                                onAction(esc.id)
+                              }}
+                              className="px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
+                              style={{ backgroundColor: '#81D24C', color: '#030303' }}
+                            >
+                              {hasApproval ? `Confirm approval` : 'Confirm action'}
+                            </button>
+                            <button
+                              onClick={() => setAwaitingConfirm(prev => { const n = new Set(prev); n.delete(esc.id); return n })}
+                              className="text-xs text-[#909BA6] hover:text-[#2F2D2E] transition-colors"
+                            >
+                              Cancel
+                            </button>
                           </div>
-                        ) : (
+                        </div>
+                      ) : hasVendorDetail ? (
+                        /* Vendor follow-up — charge nurse action */
+                        <button
+                          onClick={() => setAwaitingConfirm(prev => new Set([...prev, esc.id]))}
+                          className="px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
+                          style={{ backgroundColor: '#81D24C', color: '#030303' }}
+                        >
+                          Mark as actioned
+                        </button>
+                      ) : hasApproval ? (
+                        /* Standard item reorder — approval needed */
+                        <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: '#F5F3EF' }}>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-[#2F2D2E] mb-0.5">Reorder approval required</p>
+                            <p className="text-xs text-[#909BA6]">{esc.approvalDetail} · {esc.approvalAmount}</p>
+                          </div>
                           <button
                             onClick={() => setAwaitingConfirm(prev => new Set([...prev, esc.id]))}
-                            className="px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
-                            style={{ backgroundColor: '#81D24C', color: '#030303' }}
+                            className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-opacity hover:opacity-90"
+                            style={{ backgroundColor: '#095256', color: '#ffffff' }}
                           >
-                            Mark as actioned
+                            Approve {esc.approvalAmount}
                           </button>
-                        )
+                        </div>
                       ) : (
+                        /* PPI item — SC Director governance, no charge nurse action */
                         <div className="flex items-center gap-2 mt-1">
                           <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#CB4630' }} />
                           <span className="text-xs font-medium" style={{ color: '#CB4630' }}>
-                            Pending SC Director review — auto-reorder blocked per clinical governance
+                            Pending SC Director review — PPI item, auto-reorder blocked per clinical governance
                           </span>
                         </div>
                       )}

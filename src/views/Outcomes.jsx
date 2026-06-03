@@ -93,7 +93,7 @@ export default function Outcomes() {
     {
       label: 'Auto-Resolution Rate',
       value: `${summary.autoResolutionRate}%`,
-      sub:   'gaps resolved without human action',
+      sub:   'of detected supply gaps resolved without human action',
       delta: `+${autoRateDelta}pp vs prior week`,
       kind:  'good',
     },
@@ -304,7 +304,7 @@ export default function Outcomes() {
       {/* Current-week label when viewing historical period */}
       {selectedPeriod !== 'thisWeek' && (
         <p className="text-xs font-semibold uppercase tracking-widest text-[#F18F01] mb-3">
-          Showing current week data (Mon 25 May – Thu 29 May) — historical period selected above has no data yet
+          Showing current week data (Mon 25 May – Fri 29 May) — historical period selected above has no data yet
         </p>
       )}
 
@@ -337,7 +337,7 @@ export default function Outcomes() {
             {
               label: 'Charge Capture Flagged',
               value: `$${samplePostCaseReport.chargeCaptureSummary.estimatedRecoveryValue}`,
-              sub:   `potential recovery identified · ${samplePostCaseReport.chargeCaptureSummary.confidence.toLowerCase()} confidence`,
+              sub:   `potential recovery · 1 case this week · ${samplePostCaseReport.chargeCaptureSummary.confidence.toLowerCase()} confidence`,
               color: '#CB4630',
               note:  'View post-case report for detail',
             },

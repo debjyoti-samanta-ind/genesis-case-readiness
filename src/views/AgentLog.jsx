@@ -87,7 +87,7 @@ export default function AgentLog() {
         <div>
           <h1 className="text-3xl font-bold text-[#2F2D2E]">Agent Log</h1>
           <p className="text-sm text-[#909BA6] mt-1">
-            {hospitalContext.name} · Nightly run Thu 29 May 2026 · 02:00am
+            {hospitalContext.name} · Nightly run Fri 29 May 2026 · 02:00am
           </p>
         </div>
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-[#E3E3E3] shadow-sm flex-shrink-0 mt-1">

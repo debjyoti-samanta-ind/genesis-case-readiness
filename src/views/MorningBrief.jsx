@@ -22,8 +22,8 @@ export default function MorningBrief({ navigate }) {
               {[
                 { label: 'From',    value: 'genesis-agent@vrmc-genesis.com' },
                 { label: 'To',      value: 'maria.santos@vrmc.org; sarah.chen@vrmc.org' },
-                { label: 'Subject', value: '🟢 Genesis Case Readiness — Thu 29 May · 3 cases · 2 decisions needed' },
-                { label: 'Date',    value: 'Thu 29 May 2026, 06:00am' },
+                { label: 'Subject', value: '🔴 Genesis Case Readiness — Fri 29 May · 3 cases · 2 decisions needed' },
+                { label: 'Date',    value: 'Fri 29 May 2026, 06:00am' },
               ].map(row => (
                 <tr key={row.label} className="border-b border-[#F0F0F0] last:border-0">
                   <td className="py-2 pr-4 text-xs font-semibold uppercase tracking-widest text-[#909BA6] w-20 align-top">
@@ -143,7 +143,7 @@ export default function MorningBrief({ navigate }) {
         style={{ backgroundColor: '#EEFFFF', borderColor: '#8BFFFF' }}
       >
         <p className="text-sm text-[#095256]">
-          This email mockup shows what Maria Santos and Sarah Chen would receive each morning at 6am after the overnight agent run. In production, delivery time and recipients are configurable.
+          This email mockup shows what Maria Santos and Sarah Chen would receive each morning at 6am after the overnight agent run. The agent completes its run by ~02:00:21am — the email is scheduled for 6:00am delivery so it lands in the inbox at the start of the clinical day, not in the middle of the night. In production, delivery time and recipients are configurable.
         </p>
       </div>
     </div>

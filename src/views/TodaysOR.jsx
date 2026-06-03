@@ -55,8 +55,11 @@ export default function TodaysOR({ navigate, selectedCaseId: propCaseId }) {
           style={{ backgroundColor: '#ffffff' }}
         >
           <div className="px-4 py-3 border-b border-[#E3E3E3]">
-            <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#909BA6' }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#909BA6' }}>
               {scheduledCases.length} Cases Today
+            </p>
+            <p className="text-xs mb-2" style={{ color: '#C8CDD2' }}>
+              Score: &lt;60 = AT RISK · 60–79 = WATCH · 80+ = CLEAR
             </p>
             {/* Status filter pills (P3.3) */}
             <div className="flex gap-1.5 flex-wrap">

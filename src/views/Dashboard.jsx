@@ -120,7 +120,7 @@ export default function Dashboard({ navigate, role = 'periop' }) {
           <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm">
             <div className="px-6 py-4 border-b border-[#E3E3E3]">
               <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6]">Escalated Decisions</p>
-              <p className="text-sm text-[#909BA6] mt-0.5">{agentRun.decisionsRequiringHuman} items require your action</p>
+              <p className="text-sm text-[#909BA6] mt-0.5">1 for you to action · 1 pending SC Director</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -185,7 +185,7 @@ export default function Dashboard({ navigate, role = 'periop' }) {
             <Zap size={20} style={{ color: '#009999' }} className="flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-semibold" style={{ color: '#095256' }}>
-                Agent auto-resolved <span className="text-lg font-bold" style={{ color: '#009999' }}>{weeklyAutoResolved}</span> supply gaps this week — no manual intervention required
+                <span className="text-lg font-bold" style={{ color: '#009999' }}>{weeklyAutoResolved}</span> autonomous agent actions this week — supply checks, gap resolutions, and vendor coordination without your team lifting a finger
               </p>
               <p className="text-xs mt-1" style={{ color: '#545F66' }}>
                 {summary.autoResolutionRate}% auto-resolution rate · {summary.escalationsRaised} escalation{summary.escalationsRaised !== 1 ? 's' : ''} raised to your team · Apply your per-gap resolution time to calculate FTE hours recovered
