@@ -1,10 +1,12 @@
 # Product Requirements Document
 ## Genesis Case Readiness Orchestration Agent
 
-**Version:** 1.0  
-**Date:** 29 May 2026  
+**Version:** 1.1  
+**Date:** 3 Jun 2026  
 **Status:** Demo prototype — Phases 1–5 complete  
 **Audience:** Genesis board · Russ Mann · VP Supply Chain · Design partners · Future PM
+
+**Changelog v1.1:** Success metrics table updated — Escalations Raised replaces Gaps Auto-Resolved as the 3rd Outcomes metric card (constraint compliance: delay minutes and savings figures remain excluded). Demo scenario updated to note app opens on Outcomes view in VP Supply Chain role.
 
 ---
 
@@ -111,7 +113,7 @@ These are the metrics the product must demonstrate to the Genesis board. All are
 |--------|-----------|-------------|
 | Cases cleared | Cases that reached T-0 with no unresolved gaps | Outcomes view |
 | Auto-resolution rate | % of detected gaps resolved without human action | Outcomes view |
-| Gaps auto-resolved | Total gaps the agent handled autonomously (week total) | Outcomes view |
+| Escalations raised | Human-required decisions surfaced by the agent (week total) | Outcomes view |
 | Variance items flagged | Post-case items with quantity delta or missing scan | Outcomes view |
 
 **Not shown until baseline is validated:**
@@ -174,6 +176,8 @@ MVP proxy labels are displayed visibly in the UI — they are not hidden. This i
 **Date:** Thursday 29 May 2026  
 **Cases:** 3 orthopaedic cases (TKA ×2 AT RISK · Hip Arthroplasty WATCH · TKA ×1 CLEAR)  
 **Agent persona:** Last run 02:00am · 3 cases monitored · 3 auto-handled · 2 pending human decisions
+
+**Opening state:** App launches directly on Outcomes view in VP Supply Chain role — no navigation required to reach the board-facing view.
 
 **Demo flow (15 minutes):**
 1. Outcomes view — VP Supply Chain perspective: weekly metrics, auto-resolution rate, surgeon variance

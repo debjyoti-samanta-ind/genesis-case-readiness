@@ -1,10 +1,12 @@
 # Functional Requirements Document
 ## Genesis Case Readiness Orchestration Agent
 
-**Version:** 1.0  
-**Date:** 29 May 2026  
+**Version:** 1.1  
+**Date:** 3 Jun 2026  
 **Status:** Demo prototype — Phases 1–5 complete  
 **Audience:** Engineering team · QA · Future developers · Technical design partners
+
+**Changelog v1.1:** Default view changed to Outcomes/vpsc for demo flow · COMPLETED status badge added · PPI escalation status indicator documented · 3rd Outcomes metric card corrected to Escalations Raised · bar chart updated to 3 series · sortable table now bidirectional · conversation starter banner content specified · button text colour confirmed as `#030303`
 
 ---
 
@@ -47,6 +49,8 @@ Role-filtered nav items hide/show on toggle. Switching from `periop` to `vpsc` w
 - While on `postCase`, the sidebar highlights `todaysOR` as the active nav item (`activeNavId` logic in `App.jsx`)
 - `navigate(view, caseId)` function in `App.jsx` handles all transitions; `selectedCaseId` is passed as a second argument where needed
 
+**Default initial state:** `outcomes` view in `vpsc` role — the app opens directly on the Outcomes view in VP Supply Chain persona. This matches the demo flow sequence (board presentation starts with the business metrics view). The role switcher and nav remain fully functional to switch to any other view.
+
 ---
 
 ## 3. Design System Requirements
@@ -81,7 +85,8 @@ All screens must satisfy these requirements. Any screen failing these is a build
 - Agent Log: `font-mono text-sm`
 
 ### Button rules
-- **Primary CTA:** Background `#81D24C`, text `#030303`, `rounded-lg` — **maximum one per screen**
+- **Primary CTA:** Background `#81D24C`, text `#030303` (not white — required for AAA contrast), `rounded-lg` — **maximum one per screen**
+- **Inline action button (green):** e.g. "Mark as actioned" in CheckpointTimeline — uses same `#81D24C` background and `#030303` text. These are inline row-level actions, not screen-level CTAs; the one-per-screen rule applies to standalone header/footer CTAs only.
 - **Secondary CTA:** Background `#006FDD`, text white, `rounded-lg`
 - **Tertiary CTA:** Transparent background, border `#E3E3E3`, text `#2F2D2E`, `rounded-lg`
 - **Dark teal escalation:** Background `#095256`, text white (used for "Review & approve" in escalation queue)
@@ -100,6 +105,7 @@ All screens must satisfy these requirements. Any screen failing these is a build
 | MVP PROXY | `bg-gray-100` | `text-gray-500` |
 | CONFIRMED | `bg-green-50` | `text-green-700` |
 | PENDING | `bg-gray-100` | `text-gray-600` |
+| COMPLETED | `bg-teal-50` | `text-teal-700` |
 
 ---
 
@@ -145,7 +151,7 @@ All screens must satisfy these requirements. Any screen failing these is a build
 - Click → sets `selectedCaseId` state → loads right panel for that case
 - **"Recent · Completed" section** at bottom of left panel:
   - Shows one hardcoded entry: Total Knee Arthroplasty · Dr. Michael Chen · Tue 26 May · OR-3
-  - Status badge: "DONE" in teal
+  - Status badge: `<StatusBadge status="COMPLETED" />` — renders teal-50 background with teal-700 text
   - Clicking calls `navigate('postCase')`
 
 #### Right panel — Checkpoint timeline
@@ -168,9 +174,10 @@ Rendered by `CheckpointTimeline` component. Data from `checkpointStates[selected
 - Shown expanded when checkpoint is ACTIVE
 - Content: item name · reason · recommended action text · risk badge
 - `mvpNote` field: if present, render an "MVP PROXY" badge with the note text
-- Action button: "Mark as actioned" — calls `onAction(esc.id)`
-  - Once actioned: button disappears, item shows "Actioned" in teal
-  - If escalation `id === 'ESC-002'` is actioned: AT RISK case upgrades to WATCH in left panel
+- Escalation items split into two types based on presence of `mvpNote` field:
+  - **With `mvpNote`** (vendor-contactable escalations, e.g. ESC-002): renders supply detail block + loan kit / PO status + vendor contact, then "Mark as actioned" button (green `#81D24C`, text `#030303`). Once actioned: button replaced with "Actioned ✓" indicator in teal.
+  - **Without `mvpNote`** (PPI escalations, e.g. ESC-001): no action button. Shows a red dot status indicator: "Pending SC Director review — auto-reorder blocked per clinical governance". This communicates active escalation without implying the Periop Leader can take action.
+- If escalation `id === 'ESC-002'` is actioned: AT RISK case upgrades to WATCH in left panel
 
 #### Data source
 `scheduledCases`, `checkpointStates`, `detectedGaps`, `vendorReps`, `preferenceCards` from `syntheticData.js`
@@ -184,26 +191,32 @@ Rendered by `CheckpointTimeline` component. Data from `checkpointStates[selected
 #### Summary stat row — 4 metric cards
 | Card | Value | Delta source |
 |------|-------|-------------|
-| Cases Cleared | `weeklyOutcomes.summary.casesCleared` | vs prior period if available |
-| Auto-Resolution Rate | `weeklyOutcomes.summary.autoResolutionRate`% | `autoResolutionRatePriorWeek` |
-| Gaps Auto-Resolved | `weeklyOutcomes.summary.totalGapsAutoResolved` | — |
-| Variance Items Flagged | `weeklyOutcomes.summary.varianceItemsFlagged` | — |
+| Cases Cleared | `weeklyOutcomes.summary.casesCleared` / `totalCasesScheduled` | `clearanceRate − 71` pp vs prior week |
+| Auto-Resolution Rate | `weeklyOutcomes.summary.autoResolutionRate`% | `autoResolutionRate − autoResolutionRatePriorWeek` pp |
+| Escalations Raised | `weeklyOutcomes.summary.escalationsRaised` | `escalationsRaisedPriorWeek − escalationsRaised` vs prior week |
+| Variance Items Flagged | `weeklyOutcomes.summary.varianceItemsFlagged` | Static label: "across all surgeons this week" |
 
-**MUST NOT show:** `estimatedLaborSavingsWeek`, `estimatedAnnualisedSavings`, or any dollar figure. These fields are present in `syntheticData.js` but intentionally excluded from the UI pending design partner baseline validation.
+**MUST NOT show:** `estimatedLaborSavingsWeek`, `estimatedAnnualisedSavings`, `delayMinutesAvoided`, or any dollar figure in this view. These fields are absent from `syntheticData.js` by design — no validated baseline methodology exists yet.
 
-#### Weekly trend charts (Recharts)
-- **Bar chart:** Cases cleared (teal `#009999`) vs at-risk (amber `#F18F01`) per day, 7-day range
-- **Line chart:** Auto-resolution rate trend, 7-day range
+#### Weekly breakdown bar chart (Recharts)
+- **Bar chart — 3 series per day, 7-day range:**
+  - Cleared (teal `#009999`, dataKey `casesCleared`)
+  - At-Risk (red `#CB4630`, dataKey `atRisk`)
+  - Auto-Resolved (Genesis Green `#81D24C`, dataKey `autoResolved`)
 - Data source: `weeklyOutcomes.dailyBreakdown`
+- Custom tooltip renders each series with its colour swatch
 
 #### Surgeon variance table
 - Columns: Surgeon · Procedure · Cases this week · Avg variance items · Top variance item
-- Sortable by "Avg variance items" column (descending)
+- "Avg variance items" column header is clickable (ArrowUpDown icon, blue `#006FDD`): toggles sort ascending ↔ descending; default is descending (highest variance first)
+- Avg variance pill colour: red if ≥ 1.5, amber if ≥ 0.7, green if < 0.7
 - Data source: `weeklyOutcomes.surgeonVariance`
 
 #### Conversation starter banner (bottom)
-- Neutral grey/teal banner
-- Shows only directly observable operational facts: cases cleared, auto-resolution rate, variance items flagged
+- Background: `#EEFFFF` · Border: `#C5D6D8` · Icon: `Info` in teal `#009999`
+- Label: "This week · confirmed operational metrics only" (teal, uppercase, tracking-widest)
+- Primary text (exact): "[casesCleared] of [totalCasesScheduled] cases reached the OR with no unresolved gaps · [autoResolutionRate]% of detected gaps resolved autonomously · [varianceItemsFlagged] post-case variance items flagged across all surgeons"
+- Sub-text (exact): "Estimated savings not shown — no validated cost baseline established with design partner yet. Apply your own OR minute cost to calculate value."
 - No dollar estimates. No annualised savings. No cost-per-minute figures.
 
 ---
