@@ -104,11 +104,11 @@ export default function PostCaseReport({ navigate }) {
             </div>
             <div>
               <h1 className="text-3xl font-bold" style={{ color: '#2F2D2E' }}>Post-Case Report</h1>
-              <p className="text-sm mt-0.5" style={{ color: '#909BA6' }}>
-                {r.procedure} · {r.surgeon} · {r.date} · {r.orRoom}
+              <p className="text-base font-semibold mt-1" style={{ color: '#2F2D2E' }}>
+                {r.procedure} · {r.surgeon} · {r.orRoom}
               </p>
-              <p className="text-xs mt-0.5" style={{ color: '#909BA6' }}>
-                Report generated at {r.reportGeneratedAt} (T+4h) · Preference card {r.preferenceCardVersion} · {r.totalLineItems} total line items
+              <p className="text-sm mt-0.5" style={{ color: '#909BA6' }}>
+                {r.date} · Report generated {r.reportGeneratedAt} (T+4h) · Preference card {r.preferenceCardVersion} · {r.totalLineItems} total line items
               </p>
             </div>
           </div>
@@ -127,7 +127,7 @@ export default function PostCaseReport({ navigate }) {
               style={{ backgroundColor: '#81D24C', color: '#030303' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#42A800')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#81D24C')}
-              onClick={() => {}}
+              onClick={() => window.print()}
             >
               <Download size={15} />
               Export Report

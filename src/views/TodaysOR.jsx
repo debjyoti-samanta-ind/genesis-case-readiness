@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { scheduledCases, checkpointStates, detectedGaps, vendorReps, preferenceCards } from '../data/syntheticData'
 import CaseCard from '../components/CaseCard'
 import CheckpointTimeline from '../components/CheckpointTimeline'
@@ -19,6 +19,10 @@ function getLiveStatus(caseData, actionedEscalations) {
 export default function TodaysOR({ navigate, selectedCaseId: propCaseId }) {
   const [selectedCaseId, setSelectedCaseId] = useState(propCaseId || 'CASE-2026-0847')
   const [actionedEscalations, setActionedEscalations] = useState(new Set())
+
+  useEffect(() => {
+    if (propCaseId) setSelectedCaseId(propCaseId)
+  }, [propCaseId])
 
   const handleAction = (escId) => {
     setActionedEscalations(prev => new Set([...prev, escId]))
