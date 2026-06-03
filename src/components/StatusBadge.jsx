@@ -9,6 +9,7 @@ const statusConfig = {
   'PPI':        { bg: 'bg-red-100',    text: 'text-red-700',    label: 'PPI — ESCALATE' },
   'MVP':        { bg: 'bg-gray-100',   text: 'text-gray-500',   label: 'MVP PROXY' },
   'CONFIRMED':  { bg: 'bg-green-50',   text: 'text-green-700',  label: 'CONFIRMED' },
+  'COMPLETED':  { bg: 'bg-teal-50',    text: 'text-teal-700',   label: 'COMPLETED' },
   'PENDING':    { bg: 'bg-gray-100',   text: 'text-gray-600',   label: 'PENDING' },
 }
 

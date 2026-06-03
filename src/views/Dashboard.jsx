@@ -153,9 +153,9 @@ export default function Dashboard({ navigate, role = 'periop' }) {
             </div>
 
             <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">Delay Avoided</p>
-              <p className="text-4xl font-bold text-[#2F2D2E] mb-1">{summary.delayMinutesAvoided}<span className="text-xl font-medium text-[#909BA6]"> min</span></p>
-              <p className="text-sm text-[#909BA6]">vs {summary.delayMinutesAvoidedPriorWeek} min prior week</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">Escalations Raised</p>
+              <p className="text-4xl font-bold mb-1" style={{ color: '#F18F01' }}>{summary.escalationsRaised}</p>
+              <p className="text-sm text-[#909BA6]">gaps requiring human decision this week</p>
             </div>
 
             <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">

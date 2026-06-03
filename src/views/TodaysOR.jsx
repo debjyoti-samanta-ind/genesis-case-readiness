@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { scheduledCases, checkpointStates, detectedGaps, vendorReps, preferenceCards } from '../data/syntheticData'
 import CaseCard from '../components/CaseCard'
 import CheckpointTimeline from '../components/CheckpointTimeline'
+import StatusBadge from '../components/StatusBadge'
 
 function getLiveStatus(caseData, actionedEscalations) {
   if (caseData.status !== 'AT_RISK') return caseData.status
@@ -80,12 +81,9 @@ export default function TodaysOR({ navigate, selectedCaseId: propCaseId }) {
                     Dr. Michael Chen · Tue 26 May · OR-3
                   </p>
                 </div>
-                <span
-                  className="text-xs font-semibold px-2 py-0.5 rounded flex-shrink-0 mt-0.5"
-                  style={{ backgroundColor: '#EEFFFF', color: '#009999' }}
-                >
-                  DONE
-                </span>
+                <div className="flex-shrink-0 mt-0.5">
+                  <StatusBadge status="COMPLETED" />
+                </div>
               </div>
               <p className="text-xs mt-1.5 font-medium" style={{ color: '#006FDD' }}>
                 View post-case report →

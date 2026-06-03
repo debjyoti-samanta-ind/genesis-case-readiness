@@ -1,8 +1,9 @@
+import { useState } from 'react'
 import {
   ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
-import { TrendingUp, TrendingDown } from 'lucide-react'
+import { TrendingUp, TrendingDown, ArrowUpDown, Info } from 'lucide-react'
 import { weeklyOutcomes } from '../data/syntheticData'
 
 const { summary, dailyBreakdown, surgeonVariance } = weeklyOutcomes
@@ -42,8 +43,14 @@ function VariancePill({ avg }) {
 }
 
 export default function Outcomes() {
+  const [sortAsc, setSortAsc] = useState(false)
+
   const clearanceRate = Math.round((summary.casesCleared / summary.totalCasesScheduled) * 100)
   const autoRateDelta = summary.autoResolutionRate - summary.autoResolutionRatePriorWeek
+
+  const sortedVariance = [...surgeonVariance].sort((a, b) =>
+    sortAsc ? a.avgVarianceItems - b.avgVarianceItems : b.avgVarianceItems - a.avgVarianceItems
+  )
 
   const metricCards = [
     {
@@ -56,7 +63,7 @@ export default function Outcomes() {
     {
       label: 'Auto-Resolution Rate',
       value: `${summary.autoResolutionRate}%`,
-      sub:   'cases resolved without escalation',
+      sub:   'gaps resolved without human action',
       delta: `+${autoRateDelta}pp vs prior week`,
       kind:  'good',
     },
@@ -218,7 +225,7 @@ export default function Outcomes() {
       </div>
 
       {/* Surgeon variance table */}
-      <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm overflow-hidden mb-6">
         <div className="px-6 py-4 border-b border-[#E3E3E3]">
           <p className="text-base font-bold text-[#2F2D2E]">Surgeon Variance</p>
           <p className="text-xs text-[#909BA6] mt-0.5">
@@ -228,7 +235,7 @@ export default function Outcomes() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-[#FCFCFC] border-b border-[#E3E3E3]">
-              {['Surgeon', 'Procedure', 'Cases', 'Avg Variance Items', 'Top Variance Item'].map(col => (
+              {['Surgeon', 'Procedure', 'Cases'].map(col => (
                 <th
                   key={col}
                   className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[#909BA6]"
@@ -236,10 +243,24 @@ export default function Outcomes() {
                   {col}
                 </th>
               ))}
+              {/* Sortable column */}
+              <th
+                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest cursor-pointer select-none"
+                style={{ color: '#006FDD' }}
+                onClick={() => setSortAsc(s => !s)}
+              >
+                <span className="flex items-center gap-1">
+                  Avg Variance Items
+                  <ArrowUpDown size={12} />
+                </span>
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[#909BA6]">
+                Top Variance Item
+              </th>
             </tr>
           </thead>
           <tbody>
-            {surgeonVariance.map((row, i) => (
+            {sortedVariance.map((row, i) => (
               <tr
                 key={row.surgeon}
                 className={`border-b border-[#E3E3E3] last:border-0 hover:bg-[#FCFCFC] transition-colors ${
@@ -257,6 +278,30 @@ export default function Outcomes() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Conversation starter banner */}
+      <div
+        className="rounded-xl border px-6 py-4"
+        style={{ borderColor: '#C5D6D8', backgroundColor: '#EEFFFF' }}
+      >
+        <div className="flex items-start gap-3">
+          <Info size={15} style={{ color: '#009999' }} className="flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-1.5" style={{ color: '#009999' }}>
+              This week · confirmed operational metrics only
+            </p>
+            <p className="text-sm leading-relaxed" style={{ color: '#2F2D2E' }}>
+              {summary.casesCleared} of {summary.totalCasesScheduled} cases reached the OR with no unresolved gaps
+              · {summary.autoResolutionRate}% of detected gaps resolved autonomously
+              · {summary.varianceItemsFlagged} post-case variance items flagged across all surgeons
+            </p>
+            <p className="text-xs mt-2" style={{ color: '#545F66' }}>
+              Estimated savings not shown — no validated cost baseline established with design partner yet.
+              Apply your own OR minute cost to calculate value.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )

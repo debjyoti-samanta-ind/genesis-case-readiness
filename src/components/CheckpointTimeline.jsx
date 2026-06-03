@@ -199,8 +199,8 @@ export default function CheckpointTimeline({
                         </div>
                       )}
 
-                      {/* Action button — only on actionable (vendor) escalations */}
-                      {hasVendorDetail && (
+                      {/* Action button or status indicator */}
+                      {hasVendorDetail ? (
                         isActioned ? (
                           <div className="flex items-center gap-1.5">
                             <CheckCircle size={15} style={{ color: '#81D24C' }} />
@@ -209,12 +209,19 @@ export default function CheckpointTimeline({
                         ) : (
                           <button
                             onClick={() => onAction(esc.id)}
-                            className="px-4 py-2 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                            style={{ backgroundColor: '#81D24C' }}
+                            className="px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
+                            style={{ backgroundColor: '#81D24C', color: '#030303' }}
                           >
                             Mark as actioned
                           </button>
                         )
+                      ) : (
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#CB4630' }} />
+                          <span className="text-xs font-medium" style={{ color: '#CB4630' }}>
+                            Pending SC Director review — auto-reorder blocked per clinical governance
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>

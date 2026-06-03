@@ -15,9 +15,9 @@ const ALL_NAV = [
 ]
 
 export default function App() {
-  const [currentView, setCurrentView]       = useState('dashboard')
+  const [currentView, setCurrentView]       = useState('outcomes')
   const [selectedCaseId, setSelectedCaseId] = useState(null)
-  const [dashboardRole, setDashboardRole]   = useState('periop')
+  const [dashboardRole, setDashboardRole]   = useState('vpsc')
 
   const navigate = (view, caseId = null) => {
     setCurrentView(view)
