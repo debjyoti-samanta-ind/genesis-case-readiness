@@ -116,7 +116,7 @@ export default function App() {
               return (
                 <li key={item.id}>
                   <button
-                    onClick={() => navigate(item.id)}
+                    onClick={() => { navigate(item.id); setSidebarOpen(false) }}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left"
                     style={{
                       backgroundColor: active ? '#095256' : 'transparent',

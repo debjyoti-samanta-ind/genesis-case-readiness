@@ -92,7 +92,7 @@ export default function MorningBrief({ navigate }) {
                 <div>
                   <p className="text-sm font-semibold text-[#2F2D2E]">Tibial Component XR-7 — DePuy Synthes</p>
                   <p className="text-xs text-[#909BA6] mt-0.5">PPI item, no auto-action allowed per governance. Vendor rep (Sarah Mitchell) unresponsive for 26h.</p>
-                  <p className="text-xs mt-1"><span className="font-semibold text-[#F18F01]">Recommended: </span><span className="text-[#2F2D2E]">Call Sarah Mitchell directly — 704-555-0142</span></p>
+                  <p className="text-xs mt-1"><span className="font-semibold text-[#F18F01]">Recommended: </span><span className="text-[#2F2D2E]">Call Sarah Mitchell directly — 704-555-0147</span></p>
                 </div>
               </div>
               <div className="flex items-start gap-3 bg-[#FFFBF2] rounded-lg px-4 py-3">
@@ -116,7 +116,7 @@ export default function MorningBrief({ navigate }) {
             </p>
             <div className="space-y-2">
               {[
-                'Auto-reordered BoneFix-2 Bone Cement (×2 units) — $180 — delivery confirmed for 06:30am',
+                'Auto-reordered BoneFix-2 Bone Cement (×1 unit, $180) — PO-2026-4422 raised at 02:00am',
                 'Loan kit request sent to Sarah Mitchell at DePuy Synthes for Tibial Component XR-7 (2 sizes, 4 units)',
                 'Dr. Chen preference card drift flagged: Tibial 44mm used in 8/15 recent cases — 42mm still on card',
               ].map((item, i) => (

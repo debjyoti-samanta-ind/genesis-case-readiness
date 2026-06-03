@@ -237,7 +237,7 @@ export default function Outcomes() {
                 {dailyBreakdown.map(row => (
                   <tr key={row.day} className="border-b border-[#E3E3E3] last:border-0">
                     <td className="py-2.5 font-medium text-[#2F2D2E]">{row.day}</td>
-                    <td className="py-2.5 text-[#2F2D2E]">{row.casesCleared} / {row.totalCases}</td>
+                    <td className="py-2.5 text-[#2F2D2E]">{row.casesCleared} / {row.casesScheduled}</td>
                     <td className="py-2.5">
                       {row.atRisk > 0
                         ? <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F9EBEA', color: '#CB4630' }}>{row.atRisk} at risk</span>
@@ -251,9 +251,9 @@ export default function Outcomes() {
           {expandedCard === 'Auto-Resolution Rate' && (
             <div className="space-y-3">
               {[
-                { label: 'Inventory checks', value: 21 },
-                { label: 'Auto-reorders triggered', value: summary.loanKitRequestsSent },
-                { label: 'Loan kit emails sent', value: summary.loanKitRequestsSent },
+                { label: 'Inventory checks completed', value: 21 },
+                { label: 'Auto-reorders triggered (below $500)', value: 3 },
+                { label: 'Loan kit emails sent to vendor reps', value: summary.loanKitRequestsSent },
                 { label: 'Preference card drift checks', value: 14 },
               ].map(row => (
                 <div key={row.label} className="flex items-center justify-between border-b border-[#E3E3E3] pb-2.5">
@@ -299,6 +299,13 @@ export default function Outcomes() {
         </div>
       )}
         </>
+      )}
+
+      {/* Current-week label when viewing historical period */}
+      {selectedPeriod !== 'thisWeek' && (
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#F18F01] mb-3">
+          Showing current week data (Mon 25 May – Thu 29 May) — historical period selected above has no data yet
+        </p>
       )}
 
       {/* Agent activity row */}
