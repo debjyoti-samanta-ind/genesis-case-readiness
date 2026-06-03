@@ -156,12 +156,34 @@ export default function Outcomes() {
         </div>
       </div>
 
+      {/* Historical data banner (P3.2) */}
+      {selectedPeriod !== 'thisWeek' ? (
+        <div
+          className="rounded-xl border px-6 py-5 mb-6 flex items-start gap-3"
+          style={{ backgroundColor: '#EEFFFF', borderColor: '#8BFFFF' }}
+        >
+          <span style={{ color: '#009999', fontSize: 18 }}>ℹ</span>
+          <div>
+            <p className="text-sm font-semibold" style={{ color: '#095256' }}>
+              Historical data for {selectedPeriod === 'lastWeek' ? 'Last Week' : 'Last 30 Days'} not yet available
+            </p>
+            <p className="text-xs mt-1" style={{ color: '#545F66' }}>
+              Genesis Case Readiness requires 4+ weeks of operation to show historical comparisons. Data collection started Mon 25 May 2026.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <>
       {/* Summary metric cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        {metricCards.map(card => (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {metricCards.map(card => {
+          const isExpanded = expandedCard === card.label
+          return (
           <div
             key={card.label}
-            className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-5 flex flex-col"
+            onClick={() => setExpandedCard(isExpanded ? null : card.label)}
+            className="bg-white rounded-xl border shadow-sm p-5 flex flex-col cursor-pointer relative transition-all"
+            style={{ borderColor: isExpanded ? '#009999' : '#E3E3E3', boxShadow: isExpanded ? '0 0 0 2px #009999' : undefined }}
           >
             <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">
               {card.label}
@@ -189,16 +211,102 @@ export default function Outcomes() {
             ) : (
               <span className="text-xs text-[#909BA6] mt-auto">{card.delta}</span>
             )}
+            <ChevronDown
+              size={13}
+              className="absolute bottom-3 right-3 transition-transform"
+              style={{ color: '#909BA6', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+            />
           </div>
-        ))}
+        )})}
       </div>
+
+      {/* Expandable drilldown panel (P2.4) */}
+      {expandedCard && (
+        <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6 mb-6">
+          <p className="text-sm font-bold text-[#2F2D2E] mb-4">{expandedCard} — Detail</p>
+          {expandedCard === 'Cases Cleared' && (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#E3E3E3]">
+                  <th className="py-2 text-left text-xs text-[#909BA6] font-semibold uppercase">Day</th>
+                  <th className="py-2 text-left text-xs text-[#909BA6] font-semibold uppercase">Cleared / Scheduled</th>
+                  <th className="py-2 text-left text-xs text-[#909BA6] font-semibold uppercase">At Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dailyBreakdown.map(row => (
+                  <tr key={row.day} className="border-b border-[#E3E3E3] last:border-0">
+                    <td className="py-2.5 font-medium text-[#2F2D2E]">{row.day}</td>
+                    <td className="py-2.5 text-[#2F2D2E]">{row.casesCleared} / {row.totalCases}</td>
+                    <td className="py-2.5">
+                      {row.atRisk > 0
+                        ? <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F9EBEA', color: '#CB4630' }}>{row.atRisk} at risk</span>
+                        : <span className="text-xs text-[#909BA6]">—</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {expandedCard === 'Auto-Resolution Rate' && (
+            <div className="space-y-3">
+              {[
+                { label: 'Inventory checks', value: 21 },
+                { label: 'Auto-reorders triggered', value: summary.loanKitRequestsSent },
+                { label: 'Loan kit emails sent', value: summary.loanKitRequestsSent },
+                { label: 'Preference card drift checks', value: 14 },
+              ].map(row => (
+                <div key={row.label} className="flex items-center justify-between border-b border-[#E3E3E3] pb-2.5">
+                  <span className="text-sm text-[#2F2D2E]">{row.label}</span>
+                  <span className="text-sm font-bold" style={{ color: '#009999' }}>{row.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {expandedCard === 'Escalations Raised' && (
+            <div>
+              <div className="space-y-3 mb-4">
+                {[
+                  { label: 'PPI items (no auto-action)', value: summary.ppiItemsEscalated },
+                  { label: 'Vendor rep no-response', value: 3 },
+                  { label: 'Preference card changes', value: 1 },
+                ].map(row => (
+                  <div key={row.label} className="flex items-center justify-between border-b border-[#E3E3E3] pb-2.5">
+                    <span className="text-sm text-[#2F2D2E]">{row.label}</span>
+                    <span className="text-sm font-bold" style={{ color: '#F18F01' }}>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-[#909BA6] italic">All escalations raised to charge nurse by 02:00am</p>
+            </div>
+          )}
+          {expandedCard === 'Variance Items Flagged' && (
+            <div>
+              <p className="text-xs text-[#909BA6] mb-3">Top surgeons with avg variance &gt; 1.0 item per case</p>
+              <div className="space-y-3">
+                {surgeonVariance.filter(s => s.avgVarianceItems > 1.0).slice(0, 3).map(row => (
+                  <div key={row.surgeon} className="flex items-center justify-between border-b border-[#E3E3E3] pb-2.5">
+                    <div>
+                      <p className="text-sm font-medium text-[#2F2D2E]">{row.surgeon}</p>
+                      <p className="text-xs text-[#909BA6]">{row.procedure}</p>
+                    </div>
+                    <VariancePill avg={row.avgVarianceItems} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+        </>
+      )}
 
       {/* Agent activity row */}
       <div className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-3">
           Agent Activity This Week
         </p>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
               label: 'Preference Card Drift Detected',
@@ -218,6 +326,13 @@ export default function Outcomes() {
               value: summary.loanKitRequestsSent,
               sub:   'vendor rep emails sent autonomously by agent',
               color: '#009999',
+            },
+            {
+              label: 'Charge Capture Flagged',
+              value: `$${samplePostCaseReport.chargeCaptureSummary.estimatedRecoveryValue}`,
+              sub:   `potential recovery identified · ${samplePostCaseReport.chargeCaptureSummary.confidence.toLowerCase()} confidence`,
+              color: '#CB4630',
+              note:  'View post-case report for detail',
             },
           ].map(card => (
             <div
@@ -240,6 +355,9 @@ export default function Outcomes() {
                   <TrendingDown size={11} />
                   {card.delta}
                 </span>
+              )}
+              {card.note && (
+                <p className="text-xs mt-auto" style={{ color: '#006FDD' }}>{card.note}</p>
               )}
             </div>
           ))}
@@ -298,23 +416,34 @@ export default function Outcomes() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-[#FCFCFC] border-b border-[#E3E3E3]">
-              {['Surgeon', 'Procedure', 'Cases'].map(col => (
+              {[
+                { label: 'Surgeon', key: 'surgeon' },
+                { label: 'Procedure', key: null },
+                { label: 'Cases', key: 'casesThisWeek' },
+              ].map(col => (
                 <th
-                  key={col}
-                  className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[#909BA6]"
+                  key={col.label}
+                  className={`px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest ${col.key ? 'cursor-pointer select-none' : ''}`}
+                  style={{ color: col.key && sortConfig.key === col.key ? '#006FDD' : '#909BA6' }}
+                  onClick={col.key ? () => handleSort(col.key) : undefined}
                 >
-                  {col}
+                  {col.key ? (
+                    <span className="flex items-center gap-1">
+                      {col.label}
+                      <SortIcon colKey={col.key} />
+                    </span>
+                  ) : col.label}
                 </th>
               ))}
               {/* Sortable column */}
               <th
                 className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest cursor-pointer select-none"
-                style={{ color: '#006FDD' }}
-                onClick={() => setSortAsc(s => !s)}
+                style={{ color: sortConfig.key === 'avgVarianceItems' ? '#006FDD' : '#909BA6' }}
+                onClick={() => handleSort('avgVarianceItems')}
               >
                 <span className="flex items-center gap-1">
                   Avg Variance Items
-                  <ArrowUpDown size={12} />
+                  <SortIcon colKey="avgVarianceItems" />
                 </span>
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[#909BA6]">

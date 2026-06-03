@@ -1,4 +1,5 @@
-import { agentLogEntries, agentRun, hospitalContext } from '../data/syntheticData'
+import { useState } from 'react'
+import { agentLogEntries, agentRun, hospitalContext, scheduledCases } from '../data/syntheticData'
 import { Zap, CheckCircle, AlertTriangle, ShieldAlert } from 'lucide-react'
 
 /* ── Colour + style per entry type ─────────────────────────── */
@@ -77,6 +78,7 @@ function StatPill({ label, value, color }) {
 /* ── Main view ──────────────────────────────────────────────── */
 export default function AgentLog() {
   const fileName = `case-readiness-run-2026-05-29-0200.log`
+  const [activeTab, setActiveTab] = useState('terminal')
 
   return (
     <div>
@@ -123,7 +125,54 @@ export default function AgentLog() {
         />
       </div>
 
+      {/* Tab buttons */}
+      <div className="flex gap-2 mb-4">
+        {[
+          { id: 'summary',  label: 'Plain-English Summary' },
+          { id: 'terminal', label: 'Full Terminal Log' },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className="px-4 py-1.5 rounded-full text-sm font-medium border transition-colors"
+            style={{
+              backgroundColor: activeTab === tab.id ? '#095256' : '#ffffff',
+              color: activeTab === tab.id ? '#ffffff' : '#909BA6',
+              borderColor: activeTab === tab.id ? '#095256' : '#E3E3E3',
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Summary tab */}
+      {activeTab === 'summary' && (
+        <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">
+          <p className="text-lg font-bold text-[#2F2D2E] mb-5">What the agent did last night</p>
+          <ul className="space-y-3 mb-5">
+            {[
+              `Checked ${agentRun.totalSKUsMonitored} SKUs across ${scheduledCases.length} cases scheduled for ${agentRun.date}`,
+              `Found 3 supply gaps — 1 auto-reordered (BoneFix-2 Bone Cement, $180), 2 escalated to your team (PPI items)`,
+              `Sent loan kit request to Sarah Mitchell at DePuy Synthes for Tibial Component XR-7 (2 sizes, 4 units total)`,
+              `All ${scheduledCases.length} cases re-scored: 1 AT RISK (readiness 42), 1 WATCH (readiness 68), 1 CLEAR (readiness 91)`,
+              `Detected preference card drift: Dr. Chen has used Tibial 44mm in 8/15 recent cases — 42mm still on card`,
+            ].map((bullet, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <CheckCircle size={16} className="flex-shrink-0 mt-0.5" style={{ color: '#009999' }} />
+                <span className="text-sm text-[#2F2D2E] leading-relaxed">{bullet}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-[#909BA6] border-t border-[#E3E3E3] pt-4">
+            Run completed in {agentRun.runDurationSeconds}s at {agentRun.lastRun} · {agentRun.decisionsRequiringHuman} decisions waiting for your team
+          </p>
+        </div>
+      )}
+
       {/* Terminal window */}
+      {activeTab === 'terminal' && (
+      <>
       <div className="rounded-xl overflow-hidden shadow-lg border border-[#0e1117]">
 
         {/* macOS-style header bar */}
@@ -195,6 +244,8 @@ export default function AgentLog() {
           </div>
         ))}
       </div>
+      </>
+      )}
     </div>
   )
 }

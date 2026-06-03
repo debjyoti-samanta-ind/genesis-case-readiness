@@ -1,23 +1,26 @@
 import { useState } from 'react'
-import { LayoutDashboard, Activity, TrendingUp, ScrollText, CheckCircle } from 'lucide-react'
+import { LayoutDashboard, Activity, TrendingUp, ScrollText, CheckCircle, Mail, Menu, X } from 'lucide-react'
 import { currentUser, perioperativeLeader, agentRun } from './data/syntheticData'
 import Dashboard from './views/Dashboard'
 import TodaysOR from './views/TodaysOR'
 import Outcomes from './views/Outcomes'
 import AgentLog from './views/AgentLog'
 import PostCaseReport from './views/PostCaseReport'
+import MorningBrief from './views/MorningBrief'
 
 const ALL_NAV = [
-  { id: 'dashboard', label: 'Dashboard',   icon: LayoutDashboard },
-  { id: 'todaysOR',  label: "Today's OR",  icon: Activity,        roles: ['periop'] },
-  { id: 'outcomes',  label: 'Outcomes',    icon: TrendingUp,      roles: ['vpsc']   },
-  { id: 'agentLog',  label: 'Agent Log',   icon: ScrollText },
+  { id: 'dashboard',    label: 'Dashboard',      icon: LayoutDashboard },
+  { id: 'todaysOR',     label: "Today's OR",     icon: Activity,        roles: ['periop'] },
+  { id: 'outcomes',     label: 'Outcomes',       icon: TrendingUp,      roles: ['vpsc']   },
+  { id: 'agentLog',     label: 'Agent Log',      icon: ScrollText },
+  { id: 'morningBrief', label: 'Morning Brief',  icon: Mail },
 ]
 
 export default function App() {
   const [currentView, setCurrentView]       = useState('outcomes')
   const [selectedCaseId, setSelectedCaseId] = useState(null)
   const [dashboardRole, setDashboardRole]   = useState('vpsc')
+  const [sidebarOpen, setSidebarOpen]       = useState(false)
 
   const navigate = (view, caseId = null) => {
     setCurrentView(view)
@@ -35,27 +38,43 @@ export default function App() {
   const activeNavId = currentView === 'postCase' ? 'todaysOR' : currentView
 
   const viewMap = {
-    dashboard: <Dashboard    navigate={navigate} role={dashboardRole} />,
-    todaysOR:  <TodaysOR     navigate={navigate} selectedCaseId={selectedCaseId} />,
-    outcomes:  <Outcomes     navigate={navigate} />,
-    agentLog:  <AgentLog     navigate={navigate} />,
-    postCase:  <PostCaseReport navigate={navigate} caseId={selectedCaseId} />,
+    dashboard:    <Dashboard     navigate={navigate} role={dashboardRole} />,
+    todaysOR:     <TodaysOR      navigate={navigate} selectedCaseId={selectedCaseId} />,
+    outcomes:     <Outcomes      navigate={navigate} />,
+    agentLog:     <AgentLog      navigate={navigate} />,
+    postCase:     <PostCaseReport navigate={navigate} caseId={selectedCaseId} />,
+    morningBrief: <MorningBrief  navigate={navigate} />,
   }
 
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: '#F5F3EF' }}>
 
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Dark navy sidebar */}
       <aside
-        className="w-56 flex-shrink-0 flex flex-col sticky top-0 h-screen overflow-y-auto"
+        className={`w-56 flex-shrink-0 flex flex-col h-screen overflow-y-auto z-50 ${sidebarOpen ? 'fixed inset-y-0 left-0' : 'hidden md:flex md:sticky md:top-0'}`}
         style={{ backgroundColor: '#1a1f2e' }}
       >
         {/* Logo */}
         <div className="px-5 py-5 border-b" style={{ borderColor: '#2a3045' }}>
-          <div className="flex items-center gap-2">
-            {/* Genesis Primary Green — required on every screen */}
-            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#81D24C' }} />
-            <span className="text-white font-bold text-base">genesis</span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#81D24C' }} />
+              <span className="text-white font-bold text-base">genesis</span>
+            </div>
+            <button
+              className="md:hidden text-[#909BA6] hover:text-white"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <X size={16} />
+            </button>
           </div>
           <div className="text-xs mt-0.5 pl-4" style={{ color: '#909BA6' }}>Case Readiness</div>
         </div>
@@ -160,7 +179,15 @@ export default function App() {
       </aside>
 
       {/* Main content area */}
-      <main className="flex-1 min-w-0 px-8 py-8 overflow-auto">
+      <main className="flex-1 min-w-0 px-4 md:px-8 py-8 overflow-auto">
+        {/* Hamburger menu for mobile */}
+        <button
+          className="md:hidden mb-4 flex items-center gap-2 text-[#2F2D2E]"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu size={20} />
+          <span className="text-sm font-medium">Menu</span>
+        </button>
         {viewMap[currentView] ?? viewMap['dashboard']}
       </main>
     </div>
