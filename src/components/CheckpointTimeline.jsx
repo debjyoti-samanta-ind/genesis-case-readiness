@@ -159,6 +159,23 @@ export default function CheckpointTimeline({
                           className="rounded-md p-3 mb-4 space-y-2.5"
                           style={{ backgroundColor: '#F5F3EF' }}
                         >
+                          {/* Vendor rep contact — top of card for quick action */}
+                          <div
+                            className="flex items-center gap-2 pb-2.5 mb-0.5"
+                            style={{ borderBottom: '1px solid #E3E3E3' }}
+                          >
+                            <Phone size={13} style={{ color: '#009999' }} />
+                            <span className="text-xs font-semibold text-[#2F2D2E]">
+                              {vendorRep.name} · {vendorRep.company}
+                            </span>
+                            <span className="text-xs font-medium" style={{ color: '#009999' }}>
+                              {vendorRep.phone}
+                            </span>
+                            <span className="text-xs" style={{ color: '#006FDD' }}>
+                              {vendorRep.email}
+                            </span>
+                          </div>
+
                           <div className="text-xs">
                             <span className="font-medium text-[#2F2D2E]">{primaryGap.description}</span>
                             <span className="text-[#909BA6]">
@@ -189,13 +206,6 @@ export default function CheckpointTimeline({
                               Preference card: {prefCard.cardId} {prefCard.version} · Updated {formatLastUpdated(prefCard.lastUpdated)}
                             </div>
                           )}
-
-                          <div className="flex items-center gap-1.5">
-                            <Phone size={11} style={{ color: '#009999' }} />
-                            <span className="text-xs font-medium text-[#2F2D2E]">
-                              {vendorRep.name} · {vendorRep.company} · {vendorRep.phone}
-                            </span>
-                          </div>
                         </div>
                       )}
 

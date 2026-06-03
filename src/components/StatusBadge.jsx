@@ -7,7 +7,7 @@ const statusConfig = {
   'AUTO':       { bg: 'bg-teal-100',   text: 'text-teal-800',   label: 'AUTO-HANDLED' },
   'ESCALATED':  { bg: 'bg-orange-100', text: 'text-orange-800', label: 'ESCALATED' },
   'PPI':        { bg: 'bg-red-100',    text: 'text-red-700',    label: 'PPI — ESCALATE' },
-  'MVP':        { bg: 'bg-gray-100',   text: 'text-gray-500',   label: 'MVP PROXY' },
+  'MVP':        { bg: 'bg-gray-100',   text: 'text-gray-500',   label: 'Manual Tracking' },
   'CONFIRMED':  { bg: 'bg-green-50',   text: 'text-green-700',  label: 'CONFIRMED' },
   'COMPLETED':  { bg: 'bg-teal-50',    text: 'text-teal-700',   label: 'COMPLETED' },
   'PENDING':    { bg: 'bg-gray-100',   text: 'text-gray-600',   label: 'PENDING' },

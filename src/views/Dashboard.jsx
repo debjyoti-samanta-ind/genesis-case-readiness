@@ -103,7 +103,7 @@ export default function Dashboard({ navigate, role = 'periop' }) {
                     <td className="px-5 py-4"><StatusBadge status="AT_RISK" /></td>
                     <td className="px-5 py-4">
                       <button
-                        onClick={() => navigate('todaysOR')}
+                        onClick={() => navigate('todaysOR', 'CASE-2026-0847')}
                         className="text-xs font-medium text-white px-3 py-1.5 rounded-lg transition-colors"
                         style={{ backgroundColor: '#095256' }}
                         onMouseEnter={e => e.currentTarget.style.backgroundColor = '#009999'}
@@ -121,7 +121,7 @@ export default function Dashboard({ navigate, role = 'periop' }) {
                     <td className="px-5 py-4"><StatusBadge status="WATCH" /></td>
                     <td className="px-5 py-4">
                       <button
-                        onClick={() => navigate('todaysOR')}
+                        onClick={() => navigate('todaysOR', 'CASE-2026-0848')}
                         className="text-xs font-medium text-white px-3 py-1.5 rounded-lg transition-colors"
                         style={{ backgroundColor: '#095256' }}
                         onMouseEnter={e => e.currentTarget.style.backgroundColor = '#009999'}
@@ -138,6 +138,22 @@ export default function Dashboard({ navigate, role = 'periop' }) {
         </>
       ) : (
         <>
+          {/* VP Supply Chain: hero insight banner */}
+          <div
+            className="rounded-xl border p-4 mb-6 flex items-start gap-3"
+            style={{ backgroundColor: '#EEFFFF', borderColor: '#8BFFFF' }}
+          >
+            <Zap size={20} style={{ color: '#009999' }} className="flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold" style={{ color: '#095256' }}>
+                Agent auto-resolved <span className="text-lg font-bold" style={{ color: '#009999' }}>{weeklyAutoResolved}</span> supply gaps this week — no manual intervention required
+              </p>
+              <p className="text-xs mt-1" style={{ color: '#545F66' }}>
+                {summary.autoResolutionRate}% auto-resolution rate · {summary.escalationsRaised} escalation{summary.escalationsRaised !== 1 ? 's' : ''} raised to your team · Apply your per-gap resolution time to calculate FTE hours recovered
+              </p>
+            </div>
+          </div>
+
           {/* VP Supply Chain: 4 metric cards */}
           <div className="grid grid-cols-4 gap-5 mb-8">
             <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">

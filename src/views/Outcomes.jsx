@@ -3,7 +3,7 @@ import {
   ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
-import { TrendingUp, TrendingDown, ArrowUpDown, Info } from 'lucide-react'
+import { TrendingUp, TrendingDown, ArrowUpDown, Info, Download } from 'lucide-react'
 import { weeklyOutcomes } from '../data/syntheticData'
 
 const { summary, dailyBreakdown, surgeonVariance } = weeklyOutcomes
@@ -40,6 +40,19 @@ function VariancePill({ avg }) {
       {avg.toFixed(1)}
     </span>
   )
+}
+
+function exportCSV(data, period) {
+  const headers = ['Surgeon', 'Procedure', 'Cases This Week', 'Avg Variance Items', 'Top Variance Item']
+  const rows = data.map(r => [r.surgeon, r.procedure, r.casesThisWeek, r.avgVarianceItems, `"${r.topVarianceItem}"`])
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `genesis-outcomes-${period.replace(/[\s/]/g, '-')}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 export default function Outcomes() {
@@ -86,11 +99,21 @@ export default function Outcomes() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#2F2D2E]">Outcomes</h1>
-        <p className="text-[#909BA6] mt-1 text-sm">
-          {weeklyOutcomes.period} · Valley Regional Medical Center
-        </p>
+      <div className="flex items-start justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-[#2F2D2E]">Outcomes</h1>
+          <p className="text-[#909BA6] mt-1 text-sm">
+            {weeklyOutcomes.period} · Valley Regional Medical Center
+          </p>
+        </div>
+        <button
+          className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-80 mt-1"
+          style={{ backgroundColor: '#006FDD', color: '#ffffff' }}
+          onClick={() => exportCSV(sortedVariance, weeklyOutcomes.period)}
+        >
+          <Download size={14} />
+          Export CSV
+        </button>
       </div>
 
       {/* Summary metric cards */}
