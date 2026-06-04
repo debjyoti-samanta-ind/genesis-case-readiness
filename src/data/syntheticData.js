@@ -37,6 +37,29 @@ export const agentRun = {
   autoHandledOvernight: 3,
   decisionsRequiringHuman: 2,
   status: "COMPLETED",
+  overnightAutoHandled: [
+    {
+      icon: "reorder",
+      title: "BoneFix-2 Bone Cement — auto-reordered",
+      detail: "1 unit · $180 · standard item below $500 threshold",
+      meta: "PO-2026-4422 raised at 02:00:05am",
+      case: "TKA ×2 — Dr. Chen",
+    },
+    {
+      icon: "email",
+      title: "Loan kit request sent — Tibial Component XR-7",
+      detail: "2 sizes (42mm & 44mm) · 4 units · DePuy Synthes",
+      meta: "Emailed Sarah Mitchell at 02:00:04am · No response detected (26h)",
+      case: "TKA ×2 — Dr. Chen",
+    },
+    {
+      icon: "drift",
+      title: "Preference card drift flagged — Dr. Chen",
+      detail: "Tibial XR-7 44mm used in 8/15 recent cases · card still shows 42mm",
+      meta: "Surfaced for SC Director review — no auto-update",
+      case: "TKA ×2 — Dr. Chen",
+    },
+  ],
 }
 
 export const scheduledCases = [

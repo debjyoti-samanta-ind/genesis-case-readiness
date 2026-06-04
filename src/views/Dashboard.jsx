@@ -1,13 +1,66 @@
 import { useState } from 'react'
 import { currentUser, perioperativeLeader, agentRun, scheduledCases, weeklyOutcomes, hospitalContext } from '../data/syntheticData'
 import StatusBadge from '../components/StatusBadge'
-import { Zap, TrendingUp, TrendingDown } from 'lucide-react'
+import { Zap, TrendingUp, TrendingDown, X, ShoppingCart, Mail, AlertTriangle, CheckCircle } from 'lucide-react'
+
+function AgentActionsModal({ onClose }) {
+  const iconMap = {
+    reorder: <ShoppingCart size={14} style={{ color: '#009999' }} />,
+    email:   <Mail size={14} style={{ color: '#009999' }} />,
+    drift:   <AlertTriangle size={14} style={{ color: '#F18F01' }} />,
+  }
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
+        <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-[#E3E3E3]">
+          <div>
+            <p className="text-base font-bold text-[#2F2D2E]">Agent Auto-Handled Overnight</p>
+            <p className="text-xs text-[#909BA6] mt-0.5">Completed at 02:00:21am · {agentRun.autoHandledOvernight} actions · no human input required</p>
+          </div>
+          <button onClick={onClose} className="text-[#909BA6] hover:text-[#2F2D2E] transition-colors flex-shrink-0">
+            <X size={18} />
+          </button>
+        </div>
+        <div className="px-6 py-5 space-y-3">
+          {agentRun.overnightAutoHandled.map((item, i) => (
+            <div key={i} className="flex items-start gap-3 rounded-lg border border-[#E3E3E3] p-4">
+              <div className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EEFFFF' }}>
+                {iconMap[item.icon]}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-[#2F2D2E]">{item.title}</p>
+                <p className="text-xs text-[#545F66] mt-0.5">{item.detail}</p>
+                <p className="text-xs text-[#909BA6] mt-1">{item.meta}</p>
+                <p className="text-xs mt-1.5 font-medium" style={{ color: '#909BA6' }}>Case: {item.case}</p>
+              </div>
+              <CheckCircle size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#81D24C' }} />
+            </div>
+          ))}
+        </div>
+        <div className="px-6 py-4 border-t border-[#E3E3E3] flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg text-sm font-semibold text-white hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: '#095256' }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const { summary } = weeklyOutcomes
 const weeklyAutoResolved = weeklyOutcomes.dailyBreakdown.reduce((s, d) => s + d.autoResolved, 0)
 
 export default function Dashboard({ navigate, role = 'periop' }) {
   const [showSetup, setShowSetup] = useState(true)
+  const [showAgentActions, setShowAgentActions] = useState(false)
   const atRisk = scheduledCases.filter(c => c.status === 'AT_RISK').length
   const watch  = scheduledCases.filter(c => c.status === 'WATCH').length
   const clear  = scheduledCases.filter(c => c.status === 'CLEAR').length
@@ -84,6 +137,8 @@ export default function Dashboard({ navigate, role = 'periop' }) {
         </span>
       </div>
 
+      {showAgentActions && <AgentActionsModal onClose={() => setShowAgentActions(false)} />}
+
       {isPeriop ? (
         <>
           {/* Periop: 3 summary cards */}
@@ -106,6 +161,13 @@ export default function Dashboard({ navigate, role = 'periop' }) {
               <p className="text-4xl font-bold mb-1" style={{ color: '#009999' }}>{agentRun.autoHandledOvernight}</p>
               <p className="text-sm text-[#909BA6]">Auto-resolved overnight</p>
               <p className="text-sm font-medium mt-2" style={{ color: '#F18F01' }}>{agentRun.decisionsRequiringHuman} pending human decisions</p>
+              <button
+                onClick={() => setShowAgentActions(true)}
+                className="text-xs mt-3 hover:underline"
+                style={{ color: '#006FDD' }}
+              >
+                View actions →
+              </button>
             </div>
 
             <div className="bg-white rounded-xl border border-[#E3E3E3] shadow-sm p-6">
