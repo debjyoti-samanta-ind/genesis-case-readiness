@@ -3,7 +3,7 @@ import {
   ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
-import { TrendingUp, TrendingDown, ArrowUpDown, ArrowUp, ArrowDown, Info, Download, ChevronDown } from 'lucide-react'
+import { TrendingUp, TrendingDown, ArrowUpDown, ArrowUp, ArrowDown, Info, Download, ChevronDown, X, AlertTriangle } from 'lucide-react'
 import { weeklyOutcomes, samplePostCaseReport } from '../data/syntheticData'
 
 const { summary, dailyBreakdown, surgeonVariance } = weeklyOutcomes
@@ -55,10 +55,128 @@ function exportCSV(data, period) {
   URL.revokeObjectURL(url)
 }
 
+function ChargeCapturModal({ onClose }) {
+  const r = samplePostCaseReport
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        {/* Modal header */}
+        <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-[#E3E3E3]">
+          <div>
+            <p className="text-base font-bold text-[#2F2D2E]">Post-Case Report — Charge Capture Detail</p>
+            <p className="text-xs text-[#909BA6] mt-0.5">
+              {r.procedure} · {r.surgeon} · {r.date} · {r.orRoom} · Generated {r.reportGeneratedAt}
+            </p>
+          </div>
+          <button onClick={onClose} className="text-[#909BA6] hover:text-[#2F2D2E] transition-colors flex-shrink-0">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="px-6 py-5 space-y-6">
+          {/* Summary strip */}
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: 'Line Items', value: r.totalLineItems, color: '#2F2D2E' },
+              { label: 'Matched', value: r.matched, color: '#009999' },
+              { label: 'Variances', value: r.variances, color: '#F18F01' },
+            ].map(s => (
+              <div key={s.label} className="rounded-lg border border-[#E3E3E3] p-3 text-center">
+                <p className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</p>
+                <p className="text-xs text-[#909BA6] mt-0.5">{s.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Charge gap alert */}
+          <div className="flex items-start gap-3 rounded-lg px-4 py-3" style={{ backgroundColor: '#FDF2F0', border: '1px solid #F5C4BC' }}>
+            <AlertTriangle size={15} style={{ color: '#CB4630' }} className="flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-[#2F2D2E]">
+                Charge Capture Gap — ${r.chargeCaptureSummary.estimatedRecoveryValue} potential recovery
+              </p>
+              <p className="text-xs text-[#909BA6] mt-0.5">
+                {r.chargeCaptureSummary.gapsDetected} gap detected · {r.chargeCaptureSummary.confidence} confidence · Monocryl Suture 2-0 used but not billed
+              </p>
+            </div>
+            <span className="ml-auto flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F9EBEA', color: '#CB4630' }}>
+              HIGH
+            </span>
+          </div>
+
+          {/* Variance items table */}
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#909BA6] mb-3">Variance Items</p>
+            <div className="rounded-lg border border-[#E3E3E3] overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#FCFCFC] border-b border-[#E3E3E3]">
+                    {['Item', 'On Card', 'Used', 'Delta', 'Charge'].map(h => (
+                      <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-[#909BA6] uppercase tracking-wide">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {r.varianceItems.map(item => (
+                    <tr key={item.sku} className="border-b border-[#E3E3E3] last:border-0">
+                      <td className="px-4 py-3">
+                        <p className="text-xs font-medium text-[#2F2D2E]">{item.description}</p>
+                        <p className="text-xs text-[#909BA6]">{item.sku} · {item.category}</p>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-[#2F2D2E]">{item.qtyOnCard}</td>
+                      <td className="px-4 py-3 text-xs text-[#2F2D2E]">{item.qtyUsed}</td>
+                      <td className="px-4 py-3 text-xs font-semibold" style={{ color: item.delta > 0 || item.delta === '+2 (not on card)' ? '#F18F01' : '#009999' }}>
+                        {typeof item.delta === 'number' ? (item.delta > 0 ? `+${item.delta}` : item.delta) : item.delta}
+                      </td>
+                      <td className="px-4 py-3">
+                        {item.chargeCaptured === 'GAP'
+                          ? <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F9EBEA', color: '#CB4630' }}>GAP</span>
+                          : <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#E0F7F7', color: '#009999' }}>Billed</span>
+                        }
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Preference card update recommendation */}
+          {r.preferenceCardUpdateRecommendation.triggered && (
+            <div className="rounded-lg border border-[#E3E3E3] p-4" style={{ backgroundColor: '#FFFBF2' }}>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#F18F01] mb-2">Preference Card Update Recommended</p>
+              <p className="text-xs text-[#545F66] mb-2">{r.preferenceCardUpdateRecommendation.reason}</p>
+              <p className="text-xs font-semibold text-[#2F2D2E] mb-1">Suggested: <span className="font-normal text-[#545F66]">{r.preferenceCardUpdateRecommendation.suggestedUpdate}</span></p>
+              <p className="text-xs mt-2 font-medium" style={{ color: '#CB4630' }}>
+                ⚠ {r.preferenceCardUpdateRecommendation.actionRequired}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="px-6 py-4 border-t border-[#E3E3E3] flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: '#095256' }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Outcomes() {
   const [sortConfig, setSortConfig] = useState({ key: 'avgVarianceItems', dir: 'desc' })
   const [expandedCard, setExpandedCard] = useState(null)
   const [selectedPeriod, setSelectedPeriod] = useState('thisWeek')
+  const [showChargeModal, setShowChargeModal] = useState(false)
 
   const clearanceRate = Math.round((summary.casesCleared / summary.totalCasesScheduled) * 100)
   const autoRateDelta = summary.autoResolutionRate - summary.autoResolutionRatePriorWeek
@@ -115,6 +233,7 @@ export default function Outcomes() {
 
   return (
     <div>
+      {showChargeModal && <ChargeCapturModal onClose={() => setShowChargeModal(false)} />}
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
@@ -364,7 +483,13 @@ export default function Outcomes() {
                 </span>
               )}
               {card.note && (
-                <p className="text-xs mt-auto" style={{ color: '#006FDD' }}>{card.note}</p>
+                <button
+                  onClick={e => { e.stopPropagation(); setShowChargeModal(true) }}
+                  className="text-xs mt-auto text-left hover:underline"
+                  style={{ color: '#006FDD' }}
+                >
+                  {card.note} →
+                </button>
               )}
             </div>
           ))}
