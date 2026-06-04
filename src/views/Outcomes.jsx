@@ -576,6 +576,27 @@ export default function Outcomes() {
                 <span className="flex items-center gap-1">
                   Avg Variance Items
                   <SortIcon colKey="avgVarianceItems" />
+                  <span className="relative group ml-0.5">
+                    <Info size={11} className="cursor-help" style={{ color: '#C8CDD2' }} />
+                    <div className="absolute z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 rounded-lg shadow-lg border border-[#E3E3E3] bg-white px-3 py-3 text-left pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                      <p className="text-xs font-semibold text-[#2F2D2E] mb-1.5">Average variance items per case</p>
+                      <p className="text-xs text-[#545F66] mb-2">How often a surgeon uses items that don't match their preference card — extra items, missing items, or wrong quantities.</p>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#42A800' }} />
+                          <span className="text-xs text-[#545F66]"><span className="font-semibold text-[#2F2D2E]">&lt; 0.7</span> — card is well-maintained</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#F18F01' }} />
+                          <span className="text-xs text-[#545F66]"><span className="font-semibold text-[#2F2D2E]">0.7 – 1.4</span> — some drift, worth reviewing</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#CB4630' }} />
+                          <span className="text-xs text-[#545F66]"><span className="font-semibold text-[#2F2D2E]">1.5+</span> — significant drift, costing money</span>
+                        </div>
+                      </div>
+                    </div>
+                  </span>
                 </span>
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[#909BA6]">
