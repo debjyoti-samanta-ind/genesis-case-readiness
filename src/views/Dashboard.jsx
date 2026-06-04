@@ -126,7 +126,7 @@ export default function Dashboard({ navigate, role = 'periop' }) {
               <table className="w-full">
                 <thead>
                   <tr className="bg-[#FCFCFC] border-b border-[#E3E3E3]">
-                    {['Case', 'Checkpoint', 'Item', 'Gap', 'Risk', 'Action'].map(h => (
+                    {['Case', 'Checkpoint', 'Item', 'Gap', 'Risk', 'Owner', 'Action'].map(h => (
                       <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-[#909BA6] uppercase tracking-wide">
                         {h}
                       </th>
@@ -140,6 +140,11 @@ export default function Dashboard({ navigate, role = 'periop' }) {
                     <td className="px-5 py-4 text-sm text-[#2F2D2E]">Tibial Component XR-7</td>
                     <td className="px-5 py-4"><StatusBadge status="PPI" /></td>
                     <td className="px-5 py-4"><StatusBadge status="AT_RISK" /></td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: '#FDF2F0', color: '#CB4630' }}>
+                        SC Director
+                      </span>
+                    </td>
                     <td className="px-5 py-4">
                       <button
                         onClick={() => navigate('todaysOR', 'CASE-2026-0847')}
@@ -158,6 +163,11 @@ export default function Dashboard({ navigate, role = 'periop' }) {
                     <td className="px-5 py-4 text-sm text-[#2F2D2E]">Femoral Head 36mm</td>
                     <td className="px-5 py-4 text-sm text-[#909BA6]">Card change detected</td>
                     <td className="px-5 py-4"><StatusBadge status="WATCH" /></td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: '#EEFFFF', color: '#095256' }}>
+                        OR Manager
+                      </span>
+                    </td>
                     <td className="px-5 py-4">
                       <button
                         onClick={() => navigate('todaysOR', 'CASE-2026-0848')}
