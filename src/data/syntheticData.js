@@ -376,7 +376,43 @@ export const weeklyOutcomes = {
     { surgeon: "Dr. James Rodriguez", procedure: "THA", casesThisWeek: 2, avgVarianceItems: 1.5, topVarianceItem: "Femoral Head 36mm" },
     { surgeon: "Dr. Lisa Kim",        procedure: "TKA", casesThisWeek: 3, avgVarianceItems: 0.3, topVarianceItem: "None" },
     { surgeon: "Dr. Omar Hassan",     procedure: "THA", casesThisWeek: 2, avgVarianceItems: 0.5, topVarianceItem: "Drain 16Fr" },
-  ]
+  ],
+  prefCardDriftDetail: [
+    {
+      surgeon: "Dr. Michael Chen", procedure: "TKA", casesReviewed: 15,
+      driftItem: "Tibial Component XR-7 (44mm)", cardSays: "42mm", actualUsage: "44mm in 9/15 cases",
+      status: "Flagged — SC Director review pending",
+      statusColor: "#CB4630",
+    },
+    {
+      surgeon: "Dr. James Rodriguez", procedure: "THA", casesReviewed: 8,
+      driftItem: "Femoral Head 36mm", cardSays: "32mm", actualUsage: "36mm in 6/8 cases",
+      status: "Confirmed — card update in progress",
+      statusColor: "#F18F01",
+    },
+    {
+      surgeon: "Dr. Anita Patel", procedure: "TKA", casesReviewed: 12,
+      driftItem: "Monocryl Suture 2-0", cardSays: "Not on card", actualUsage: "Used in 7/12 cases",
+      status: "Flagged — awaiting surgeon confirmation",
+      statusColor: "#F18F01",
+    },
+  ],
+  ppiEscalationDetail: [
+    {
+      case: "TKA ×2 — Dr. Chen", date: "Fri 29 May", checkpoint: "T-48h",
+      item: "Tibial Component XR-7 (42mm & 44mm)", vendor: "DePuy Synthes",
+      rep: "Sarah Mitchell", repPhone: "704-555-0147",
+      action: "Loan kit request sent — no response in 26h",
+      status: "AT RISK", statusColor: "#CB4630",
+    },
+    {
+      case: "Hip Arthroplasty — Dr. Rodriguez", date: "Thu 28 May", checkpoint: "T-48h",
+      item: "Acetabular Cup 54mm", vendor: "Stryker Orthopaedics",
+      rep: "Daniel Park", repPhone: "704-555-0183",
+      action: "Loan kit request sent — confirmed delivery 7am",
+      status: "RESOLVED", statusColor: "#009999",
+    },
+  ],
 }
 
 export const samplePostCaseReport = {

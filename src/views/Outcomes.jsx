@@ -6,7 +6,7 @@ import {
 import { TrendingUp, TrendingDown, ArrowUpDown, ArrowUp, ArrowDown, Info, Download, ChevronDown, X, AlertTriangle } from 'lucide-react'
 import { weeklyOutcomes, samplePostCaseReport } from '../data/syntheticData'
 
-const { summary, dailyBreakdown, surgeonVariance } = weeklyOutcomes
+const { summary, dailyBreakdown, surgeonVariance, prefCardDriftDetail, ppiEscalationDetail } = weeklyOutcomes
 
 /* ── Custom tooltip ─────────────────────────────────────────── */
 function ChartTooltip({ active, payload, label }) {
@@ -53,6 +53,109 @@ function exportCSV(data, period) {
   a.download = `genesis-outcomes-${period.replace(/[\s/]/g, '-')}.csv`
   a.click()
   URL.revokeObjectURL(url)
+}
+
+function PrefCardDriftModal({ onClose }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-[#E3E3E3]">
+          <div>
+            <p className="text-base font-bold text-[#2F2D2E]">Preference Card Drift — This Week</p>
+            <p className="text-xs text-[#909BA6] mt-0.5">{prefCardDriftDetail.length} surgeons with detected drift · Mon 25 – Fri 29 May 2026</p>
+          </div>
+          <button onClick={onClose} className="text-[#909BA6] hover:text-[#2F2D2E] transition-colors flex-shrink-0"><X size={18} /></button>
+        </div>
+        <div className="px-6 py-5 space-y-3">
+          <p className="text-xs text-[#909BA6]">Drift is detected when PoC scan data shows a surgeon consistently using items that differ from their current preference card.</p>
+          <div className="rounded-lg border border-[#E3E3E3] overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#FCFCFC] border-b border-[#E3E3E3]">
+                  {['Surgeon', 'Item', 'Card Says', 'Actual Usage', 'Status'].map(h => (
+                    <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-[#909BA6] uppercase tracking-wide">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {prefCardDriftDetail.map(row => (
+                  <tr key={row.surgeon} className="border-b border-[#E3E3E3] last:border-0">
+                    <td className="px-4 py-3">
+                      <p className="text-xs font-semibold text-[#2F2D2E]">{row.surgeon}</p>
+                      <p className="text-xs text-[#909BA6]">{row.procedure} · {row.casesReviewed} cases reviewed</p>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-[#2F2D2E]">{row.driftItem}</td>
+                    <td className="px-4 py-3 text-xs text-[#909BA6]">{row.cardSays}</td>
+                    <td className="px-4 py-3 text-xs font-medium" style={{ color: '#F18F01' }}>{row.actualUsage}</td>
+                    <td className="px-4 py-3">
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.statusColor + '22', color: row.statusColor }}>
+                        {row.status.split(' — ')[0]}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-[#909BA6] italic">Card updates require SC Director review and surgeon sign-off before taking effect.</p>
+        </div>
+        <div className="px-6 py-4 border-t border-[#E3E3E3] flex justify-end">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-white hover:opacity-90" style={{ backgroundColor: '#095256' }}>Close</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function PPIEscalationModal({ onClose }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-[#E3E3E3]">
+          <div>
+            <p className="text-base font-bold text-[#2F2D2E]">PPI Items Escalated — This Week</p>
+            <p className="text-xs text-[#909BA6] mt-0.5">{ppiEscalationDetail.length} escalations · auto-reorder blocked per clinical governance</p>
+          </div>
+          <button onClick={onClose} className="text-[#909BA6] hover:text-[#2F2D2E] transition-colors flex-shrink-0"><X size={18} /></button>
+        </div>
+        <div className="px-6 py-5 space-y-3">
+          <p className="text-xs text-[#909BA6]">PPI (Physician Preference Items) cannot be auto-reordered. The agent sends loan kit requests and escalates to SC Director for each.</p>
+          <div className="space-y-3">
+            {ppiEscalationDetail.map(row => (
+              <div key={row.case} className="rounded-lg border border-[#E3E3E3] p-4">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div>
+                    <p className="text-sm font-semibold text-[#2F2D2E]">{row.case}</p>
+                    <p className="text-xs text-[#909BA6] mt-0.5">{row.date} · {row.checkpoint} checkpoint</p>
+                  </div>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: row.statusColor + '22', color: row.statusColor }}>
+                    {row.status}
+                  </span>
+                </div>
+                <div className="space-y-1.5 mt-3">
+                  <div className="flex gap-2 text-xs"><span className="text-[#909BA6] w-16 flex-shrink-0">Item</span><span className="text-[#2F2D2E] font-medium">{row.item}</span></div>
+                  <div className="flex gap-2 text-xs"><span className="text-[#909BA6] w-16 flex-shrink-0">Vendor</span><span className="text-[#2F2D2E]">{row.vendor}</span></div>
+                  <div className="flex gap-2 text-xs"><span className="text-[#909BA6] w-16 flex-shrink-0">Rep</span><span className="text-[#2F2D2E]">{row.rep} · {row.repPhone}</span></div>
+                  <div className="flex gap-2 text-xs"><span className="text-[#909BA6] w-16 flex-shrink-0">Action</span><span className="font-medium" style={{ color: row.statusColor }}>{row.action}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="px-6 py-4 border-t border-[#E3E3E3] flex justify-end">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-white hover:opacity-90" style={{ backgroundColor: '#095256' }}>Close</button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function ChargeCapturModal({ onClose }) {
@@ -177,6 +280,8 @@ export default function Outcomes() {
   const [expandedCard, setExpandedCard] = useState(null)
   const [selectedPeriod, setSelectedPeriod] = useState('thisWeek')
   const [showChargeModal, setShowChargeModal] = useState(false)
+  const [showDriftModal, setShowDriftModal] = useState(false)
+  const [showPPIModal, setShowPPIModal] = useState(false)
   const [tooltipPos, setTooltipPos] = useState(null)
 
   const showTooltip = (e) => {
@@ -240,6 +345,8 @@ export default function Outcomes() {
   return (
     <div>
       {showChargeModal && <ChargeCapturModal onClose={() => setShowChargeModal(false)} />}
+      {showDriftModal && <PrefCardDriftModal onClose={() => setShowDriftModal(false)} />}
+      {showPPIModal && <PPIEscalationModal onClose={() => setShowPPIModal(false)} />}
 
       {tooltipPos && (
         <div
@@ -464,66 +571,49 @@ export default function Outcomes() {
           Agent Activity This Week
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              label: 'Preference Card Drift Detected',
-              value: summary.preferenceCardDrift,
-              sub:   'cases where surgeon usage differed from current preference card',
-              color: '#F18F01',
-              delta: `−${summary.preferenceCardDriftPriorWeek - summary.preferenceCardDrift} vs prior week`,
-            },
-            {
-              label: 'PPI Items Escalated',
-              value: summary.ppiItemsEscalated,
-              sub:   'physician preference items flagged — auto-reorder blocked per governance',
-              color: '#CB4630',
-            },
-            {
-              label: 'Loan Kit Requests Sent',
-              value: summary.loanKitRequestsSent,
-              sub:   'vendor rep emails sent autonomously by agent',
-              color: '#009999',
-            },
-            {
-              label: 'Charge Capture Flagged',
-              value: `$${samplePostCaseReport.chargeCaptureSummary.estimatedRecoveryValue}`,
-              sub:   `potential recovery · 1 case this week · ${samplePostCaseReport.chargeCaptureSummary.confidence.toLowerCase()} confidence`,
-              color: '#CB4630',
-              note:  'View post-case report for detail',
-            },
-          ].map(card => (
-            <div
-              key={card.label}
-              className="rounded-xl border border-[#E3E3E3] shadow-sm p-4 flex flex-col"
-              style={{ backgroundColor: '#FCFCFC' }}
-            >
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-2">
-                {card.label}
-              </p>
-              <p className="text-2xl font-bold leading-none mb-1" style={{ color: card.color }}>
-                {card.value}
-              </p>
-              <p className="text-xs text-[#909BA6] mb-2">{card.sub}</p>
-              {card.delta && (
-                <span
-                  className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full self-start mt-auto"
-                  style={{ backgroundColor: '#daffd1', color: '#42A800' }}
-                >
-                  <TrendingDown size={11} />
-                  {card.delta}
-                </span>
-              )}
-              {card.note && (
-                <button
-                  onClick={e => { e.stopPropagation(); setShowChargeModal(true) }}
-                  className="text-xs mt-auto text-left hover:underline"
-                  style={{ color: '#006FDD' }}
-                >
-                  {card.note} →
-                </button>
-              )}
-            </div>
-          ))}
+          {/* Preference Card Drift */}
+          <div
+            className="rounded-xl border border-[#E3E3E3] shadow-sm p-4 flex flex-col cursor-pointer hover:border-[#F18F01] transition-colors"
+            style={{ backgroundColor: '#FCFCFC' }}
+            onClick={() => setShowDriftModal(true)}
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-2">Preference Card Drift Detected</p>
+            <p className="text-2xl font-bold leading-none mb-1" style={{ color: '#F18F01' }}>{summary.preferenceCardDrift}</p>
+            <p className="text-xs text-[#909BA6] mb-2">cases where surgeon usage differed from current preference card</p>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full self-start" style={{ backgroundColor: '#daffd1', color: '#42A800' }}>
+              <TrendingDown size={11} />−{summary.preferenceCardDriftPriorWeek - summary.preferenceCardDrift} vs prior week
+            </span>
+            <p className="text-xs mt-2" style={{ color: '#006FDD' }}>View surgeons & items →</p>
+          </div>
+
+          {/* PPI Items Escalated */}
+          <div
+            className="rounded-xl border border-[#E3E3E3] shadow-sm p-4 flex flex-col cursor-pointer hover:border-[#CB4630] transition-colors"
+            style={{ backgroundColor: '#FCFCFC' }}
+            onClick={() => setShowPPIModal(true)}
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-2">PPI Items Escalated</p>
+            <p className="text-2xl font-bold leading-none mb-1" style={{ color: '#CB4630' }}>{summary.ppiItemsEscalated}</p>
+            <p className="text-xs text-[#909BA6] mb-2">physician preference items flagged — auto-reorder blocked per governance</p>
+            <p className="text-xs mt-auto" style={{ color: '#006FDD' }}>View cases & vendor status →</p>
+          </div>
+
+          {/* Loan Kit Requests Sent */}
+          <div className="rounded-xl border border-[#E3E3E3] shadow-sm p-4 flex flex-col" style={{ backgroundColor: '#FCFCFC' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-2">Loan Kit Requests Sent</p>
+            <p className="text-2xl font-bold leading-none mb-1" style={{ color: '#009999' }}>{summary.loanKitRequestsSent}</p>
+            <p className="text-xs text-[#909BA6]">vendor rep emails sent autonomously by agent</p>
+          </div>
+
+          {/* Charge Capture Flagged */}
+          <div className="rounded-xl border border-[#E3E3E3] shadow-sm p-4 flex flex-col" style={{ backgroundColor: '#FCFCFC' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#909BA6] mb-2">Charge Capture Flagged</p>
+            <p className="text-2xl font-bold leading-none mb-1" style={{ color: '#CB4630' }}>${samplePostCaseReport.chargeCaptureSummary.estimatedRecoveryValue}</p>
+            <p className="text-xs text-[#909BA6] mb-2">potential recovery · 1 case this week · {samplePostCaseReport.chargeCaptureSummary.confidence.toLowerCase()} confidence</p>
+            <button onClick={() => setShowChargeModal(true)} className="text-xs mt-auto text-left hover:underline" style={{ color: '#006FDD' }}>
+              View post-case report for detail →
+            </button>
+          </div>
         </div>
       </div>
 
