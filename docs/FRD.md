@@ -1,10 +1,12 @@
 # Functional Requirements Document
 ## Genesis Case Readiness Orchestration Agent
 
-**Version:** 1.1  
-**Date:** 3 Jun 2026  
-**Status:** Demo prototype — Phases 1–5 complete  
+**Version:** 1.2  
+**Date:** 4 Jun 2026  
+**Status:** Demo prototype — Phases 1–6 complete  
 **Audience:** Engineering team · QA · Future developers · Technical design partners
+
+**Changelog v1.2:** Morning Brief view added (VIEW 6) — daily email mockup, new nav item (Mail icon), visible to both personas. Dashboard escalation table: Owner column added with SC Director (red `#CB4630`) and OR Manager (teal `#095256`) badges. CheckpointTimeline: three-branch escalation logic documented (PPI / standard reorder / vendor follow-up). Outcomes VP view: Charge Capture Flagged modal (ChargeCapturModal), Preference Card Drift drilldown modal (PrefCardDriftModal), PPI Escalations drilldown modal (PPIEscalationModal), Avg Variance Items tooltip (fixed-position, state-driven), Agent Activity cards for Drift and PPI made clickable. syntheticData.js: `prefCardDriftDetail` and `ppiEscalationDetail` arrays added under `weeklyOutcomes`.
 
 **Changelog v1.1:** Default view changed to Outcomes/vpsc for demo flow · COMPLETED status badge added · PPI escalation status indicator documented · 3rd Outcomes metric card corrected to Escalations Raised · bar chart updated to 3 series · sortable table now bidirectional · conversation starter banner content specified · button text colour confirmed as `#030303`
 
@@ -42,6 +44,7 @@ Role-filtered nav items hide/show on toggle. Switching from `periop` to `vpsc` w
 | `todaysOR` | Today's OR | Perioperative Leader | Sidebar nav item (hidden for `vpsc`) |
 | `outcomes` | Outcomes | VP Supply Chain | Sidebar nav item (hidden for `periop`) |
 | `agentLog` | Agent Log | Both | Sidebar nav item |
+| `morningBrief` | Morning Brief | Both | Sidebar nav item (Mail icon) |
 | `postCase` | Post-Case Report | Perioperative Leader | Click "Recent · Completed" case in Today's OR left panel |
 
 **Rules:**
@@ -130,8 +133,11 @@ All screens must satisfy these requirements. Any screen failing these is a build
 - Displays all human-required decisions across all cases
 - Sort order: checkpoint urgency first (T-4h before T-48h), then risk level (HIGH before MEDIUM)
 - Maximum 6 rows visible before scroll
-- Columns: Case · Checkpoint · Item · Gap description · Risk badge · Action button (one per row)
-- Action button: primary action only (e.g., "Call rep", "Approve reorder")
+- Columns: Case · Checkpoint · Item · Gap description · Risk badge · **Owner** · Action button (one per row)
+- **Owner column:** colour-coded badge indicating the responsible role for each escalation:
+  - **SC Director** — red badge (`backgroundColor: '#FDF2F0', color: '#CB4630'`) — used for PPI items and governance-blocked reorders
+  - **OR Manager** — teal badge (`backgroundColor: '#EEFFFF', color: '#095256'`) — used for preference card changes and standard reorder approvals
+- Action button: navigates to `todaysOR` with the relevant `caseId` pre-selected via `navigate('todaysOR', 'CASE-XXXX-NNNN')`
 
 #### Data source
 `scheduledCases`, `checkpointStates`, `detectedGaps`, `agentRun`, `currentUser` / `perioperativeLeader` from `syntheticData.js`
@@ -173,11 +179,18 @@ Rendered by `CheckpointTimeline` component. Data from `checkpointStates[selected
 **Escalation items (inside each checkpoint):**
 - Shown expanded when checkpoint is ACTIVE
 - Content: item name · reason · recommended action text · risk badge
-- `mvpNote` field: if present, render an "MVP PROXY" badge with the note text
-- Escalation items split into two types based on presence of `mvpNote` field:
-  - **With `mvpNote`** (vendor-contactable escalations, e.g. ESC-002): renders supply detail block + loan kit / PO status + vendor contact, then "Mark as actioned" button (green `#81D24C`, text `#030303`). Once actioned: button replaced with "Actioned ✓" indicator in teal.
-  - **Without `mvpNote`** (PPI escalations, e.g. ESC-001): no action button. Shows a red dot status indicator: "Pending SC Director review — auto-reorder blocked per clinical governance". This communicates active escalation without implying the Periop Leader can take action.
-- If escalation `id === 'ESC-002'` is actioned: AT RISK case upgrades to WATCH in left panel
+- Escalation items follow a **three-branch logic** based on field presence:
+
+| Branch | Detection | UI treatment | Who acts |
+|--------|-----------|--------------|----------|
+| **Vendor follow-up** | `esc.mvpNote !== undefined` (e.g. ESC-002) | Supply detail block + vendor contact (phone + email promoted to top of card) + loan kit/PO status + "Mark as actioned" button (`#81D24C`, text `#030303`) | Charge nurse / OR Manager |
+| **Standard reorder approval** | `esc.approvalNote !== undefined` (e.g. ESC-003) | Approval detail panel (`#F5F3EF` background) showing item, qty, cost + "Approve $[amount]" button (`#095256`) | OR Manager / SC Director |
+| **PPI governance** | Neither field present (e.g. ESC-001) | Red dot indicator: "Pending SC Director review — PPI item, auto-reorder blocked per clinical governance". No action button. | SC Director only — Periop Leader cannot act |
+
+- Badge status: `hasVendorDetail → 'ESCALATED'` · `hasApproval → 'WATCH'` · neither → `'PPI'`
+- Once actioned (any branch): button replaced with `CheckCircle` icon + "Actioned ✓" in green `#42A800`; saved note (if entered) displayed in italic below
+- Awaiting confirm state: textarea for optional note + "Confirm action" / "Confirm approval" + Cancel
+- If ESC-002 is actioned: AT RISK case upgrades to WATCH in left panel via `getLiveStatus()`
 
 #### Data source
 `scheduledCases`, `checkpointStates`, `detectedGaps`, `vendorReps`, `preferenceCards` from `syntheticData.js`
@@ -206,9 +219,29 @@ Rendered by `CheckpointTimeline` component. Data from `checkpointStates[selected
 - Data source: `weeklyOutcomes.dailyBreakdown`
 - Custom tooltip renders each series with its colour swatch
 
+#### Agent activity cards (4 cards below summary metrics)
+| Card | Value | Clickable | Opens |
+|------|-------|-----------|-------|
+| Preference Card Drift Detected | `summary.preferenceCardDrift` | Yes — hover border turns amber | `PrefCardDriftModal` |
+| PPI Items Escalated | `summary.ppiItemsEscalated` | Yes — hover border turns red | `PPIEscalationModal` |
+| Loan Kit Requests Sent | `summary.loanKitRequestsSent` | No | — |
+| Charge Capture Flagged | `$samplePostCaseReport.chargeCaptureSummary.estimatedRecoveryValue` | "View post-case report →" link | `ChargeCapturModal` |
+
+**PrefCardDriftModal:** Table of surgeons with detected drift. Columns: Surgeon · Item · Card Says · Actual Usage · Status. Data source: `weeklyOutcomes.prefCardDriftDetail`. Footer note: "Card updates require SC Director review and surgeon sign-off."
+
+**PPIEscalationModal:** Per-case cards. Each card shows: case name · date · checkpoint · item · vendor · rep name + phone · loan kit action taken · resolution status. Data source: `weeklyOutcomes.ppiEscalationDetail`.
+
+**ChargeCapturModal:** Shows post-case report detail for the flagged case. Sections: summary strip (line items / matched / variances), charge gap alert with estimated recovery value and confidence, variance items table (Billed vs GAP badges), preference card update recommendation. Data source: `samplePostCaseReport`.
+
+All three modals: fixed-position overlay (`z-50`), click-outside-to-close, Close button in footer, max-width `2xl`, max-height `90vh` with scroll.
+
 #### Surgeon variance table
 - Columns: Surgeon · Procedure · Cases this week · Avg variance items · Top variance item
-- "Avg variance items" column header is clickable (ArrowUpDown icon, blue `#006FDD`): toggles sort ascending ↔ descending; default is descending (highest variance first)
+- "Avg variance items" column header: sortable (ArrowUpDown icon, blue `#006FDD`), toggles asc ↔ desc; default descending
+- **Tooltip on column header:** ⓘ icon (`Info`, grey `#C8CDD2`) — on hover, renders a fixed-position tooltip (state-driven, not CSS group-hover — required to escape `overflow-hidden` table container) explaining:
+  - Definition: "How often a surgeon uses items that don't match their preference card — extra items, missing items, or wrong quantities"
+  - Three colour thresholds with dot indicators: `< 0.7` green (well-maintained) · `0.7–1.4` amber (some drift) · `1.5+` red (significant drift, costing money)
+  - Tooltip position calculated from `getBoundingClientRect()` on mouseenter; cleared on mouseleave
 - Avg variance pill colour: red if ≥ 1.5, amber if ≥ 0.7, green if < 0.7
 - Data source: `weeklyOutcomes.surgeonVariance`
 
@@ -302,6 +335,46 @@ Conditional: only rendered when `preferenceCardUpdateRecommendation.triggered ==
 
 ---
 
+### VIEW 6 — Morning Brief
+
+**Purpose:** Show what the Perioperative Leader and OR Manager receive in their inbox at 6:00am. Accessible to both personas via sidebar (Mail icon, state value `morningBrief`).
+
+**Layout:** Email card rendered inside a white card with a realistic email header bar, followed by an explanatory info box below.
+
+#### Email header bar
+Rendered as a table: From · To · Subject · Date
+
+| Field | Value |
+|-------|-------|
+| From | `genesis-agent@vrmc-genesis.com` |
+| To | `maria.santos@vrmc.org; sarah.chen@vrmc.org` |
+| Subject | `🔴 Genesis Case Readiness — Fri 29 May · 3 cases · 2 decisions needed` |
+| Date | `Fri 29 May 2026, 06:00am` |
+
+#### Email body sections
+
+**Section 1 — Today's OR** (teal `#095256` header)
+Table of all cases from `scheduledCases`: Procedure · Time · Surgeon · Status badge. Displays `{scheduledCases.length} Cases` in the section header.
+
+**Section 2 — Decisions Needed** (red `#CB4630` header)
+Hardcoded: "2 Decisions Needed by 7:30am". Two decision items with coloured emoji indicators (🔴 / 🟡), item name, reason, vendor contact (phone number matching `vendorReps` data), and recommended action. Items correspond to ESC-001 (PPI Tibial Component) and ESC-003 (Femoral Head card change).
+
+**Section 3 — Agent Auto-Handled Overnight** (teal `#009999` header, checkmark `✓` icons)
+Three auto-handled actions listed as bullet items:
+- BoneFix-2 Bone Cement auto-reordered (×1 unit, $180, PO number, time)
+- Loan kit request sent to vendor rep for Tibial Component XR-7
+- Dr. Chen preference card drift flagged (Tibial 44mm used in 8/15 recent cases)
+
+**Email footer:** Reply / Unsubscribe / genesis URL — visual decoration only.
+
+#### Info box (below email card)
+Background `#EEFFFF`, border `#8BFFFF`. Explains: agent run completes ~02:00:21am; email scheduled for 6:00am delivery so it lands at start of clinical day; delivery time and recipients are configurable.
+
+#### Data source
+`scheduledCases`, `hospitalContext`, `vendorReps` from `syntheticData.js`. Decision items and auto-handled items are hardcoded strings matching syntheticData values (phone: `704-555-0147`, BoneFix quantity: ×1, PO: `PO-2026-4422`).
+
+---
+
 ## 5. Agent Authority Boundary Rules
 
 The agent's decision-making authority is strictly bounded. These rules must be visible in the UI — not hidden in documentation only.
@@ -355,7 +428,9 @@ The agent stages these and waits for a human decision:
 | `vendorReps` | Array | Today's OR (via CheckpointTimeline) |
 | `checkpointStates` | Object (keyed by caseId) | Today's OR |
 | `weeklyOutcomes` | Object | Outcomes |
-| `samplePostCaseReport` | Object | Post-Case Report |
+| `weeklyOutcomes.prefCardDriftDetail` | Array | Outcomes — PrefCardDriftModal |
+| `weeklyOutcomes.ppiEscalationDetail` | Array | Outcomes — PPIEscalationModal |
+| `samplePostCaseReport` | Object | Post-Case Report · Outcomes ChargeCapturModal |
 | `agentLogEntries` | Array | Agent Log |
 
 ### Field naming conventions
@@ -422,7 +497,8 @@ genesis-case-readiness/
 │   │   ├── TodaysOR.jsx                ← VIEW 2 — Perioperative Leader
 │   │   ├── Outcomes.jsx                ← VIEW 3 — VP Supply Chain
 │   │   ├── AgentLog.jsx                ← VIEW 4 — Terminal reasoning view
-│   │   └── PostCaseReport.jsx          ← VIEW 5 — Variance report
+│   │   ├── PostCaseReport.jsx          ← VIEW 5 — Variance report
+│   │   └── MorningBrief.jsx            ← VIEW 6 — Daily 6am email mockup
 │   ├── App.jsx                         ← Root: routing state + sidebar shell
 │   └── main.jsx
 ├── index.html

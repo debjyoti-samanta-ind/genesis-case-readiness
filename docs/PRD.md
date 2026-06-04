@@ -1,10 +1,12 @@
 # Product Requirements Document
 ## Genesis Case Readiness Orchestration Agent
 
-**Version:** 1.1  
-**Date:** 3 Jun 2026  
-**Status:** Demo prototype — Phases 1–5 complete  
+**Version:** 1.2  
+**Date:** 4 Jun 2026  
+**Status:** Demo prototype — Phases 1–6 complete  
 **Audience:** Genesis board · Russ Mann · VP Supply Chain · Design partners · Future PM
+
+**Changelog v1.2:** Morning Brief view added (new feature — daily 6am email mockup). Dashboard escalation table updated with Owner column (SC Director / OR Manager badges). Outcomes VP view enhanced: Charge Capture modal, Preference Card Drift drilldown modal, PPI Escalations drilldown modal, Avg Variance Items tooltip with colour thresholds. Agent Activity cards (Drift + PPI) now clickable with deep-dive popups.
 
 **Changelog v1.1:** Success metrics table updated — Escalations Raised replaces Gaps Auto-Resolved as the 3rd Outcomes metric card (constraint compliance: delay minutes and savings figures remain excluded). Demo scenario updated to note app opens on Outcomes view in VP Supply Chain role.
 
@@ -103,6 +105,12 @@ At T+4h after case completion, the agent compares actual PoC scan data against t
 ### 5.6 Preference card drift surfacing
 Where a surgeon's actual usage differs from their preference card across 3+ consecutive cases, the agent surfaces a recommendation to update the card. This is informational only — no auto-update action. SC Director review and surgeon confirmation are required.
 
+### 5.7 Morning Brief email digest
+At 6:00am each day, after the overnight agent run (~02:00am), the agent sends a structured email summary to the Perioperative Leader and OR Manager. The email contains: today's OR case list with readiness status, decisions required before 7:30am (with recommended actions and vendor rep contact details), and a summary of actions the agent auto-handled overnight. Delivery time and recipients are configurable per hospital. The Morning Brief view in the prototype is a pixel-accurate mockup of this email, rendered in-app for demo purposes.
+
+### 5.8 Ownership clarity in escalation routing
+Every human-required escalation is tagged with a responsible owner — either **SC Director** (for PPI and governance-blocked items) or **OR Manager** (for preference card changes, standard reorder approvals, and vendor follow-up actions). This tagging is surfaced in the Dashboard escalation table as a colour-coded badge and in the Morning Brief decisions section. It prevents the Perioperative Leader from acting on items that require SC Director authority, and vice versa.
+
 ---
 
 ## 6. Success Metrics
@@ -180,9 +188,10 @@ MVP proxy labels are displayed visibly in the UI — they are not hidden. This i
 **Opening state:** App launches directly on Outcomes view in VP Supply Chain role — no navigation required to reach the board-facing view.
 
 **Demo flow (15 minutes):**
-1. Outcomes view — VP Supply Chain perspective: weekly metrics, auto-resolution rate, surgeon variance
-2. Today's OR — Perioperative Leader perspective: AT RISK case, PPI escalation, mark as actioned
-3. Agent Log — transparency layer: full timestamped reasoning run
-4. Post-Case Report — completed Tuesday case: variance table, charge capture gap, preference card recommendation
+1. Outcomes view — VP Supply Chain perspective: weekly metrics, auto-resolution rate, surgeon variance; click Preference Card Drift card → surgeon drilldown modal; click Charge Capture → post-case detail modal
+2. Today's OR — Perioperative Leader perspective: AT RISK case, PPI escalation, Owner column showing SC Director vs OR Manager, mark as actioned
+3. Morning Brief — show what lands in Maria Santos's inbox at 6am: case list, 2 decisions needed, agent auto-handled items
+4. Agent Log — transparency layer: full timestamped reasoning run
+5. Post-Case Report — completed Tuesday case: variance table, charge capture gap, preference card recommendation
 
 **The ask:** Design partner introduction from Shane and Charles before end of this week, so Week 3 customer discovery interviews start on schedule.
