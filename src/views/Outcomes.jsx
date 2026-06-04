@@ -177,6 +177,12 @@ export default function Outcomes() {
   const [expandedCard, setExpandedCard] = useState(null)
   const [selectedPeriod, setSelectedPeriod] = useState('thisWeek')
   const [showChargeModal, setShowChargeModal] = useState(false)
+  const [tooltipPos, setTooltipPos] = useState(null)
+
+  const showTooltip = (e) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    setTooltipPos({ top: r.bottom + 8, left: r.left + r.width / 2 })
+  }
 
   const clearanceRate = Math.round((summary.casesCleared / summary.totalCasesScheduled) * 100)
   const autoRateDelta = summary.autoResolutionRate - summary.autoResolutionRatePriorWeek
@@ -234,6 +240,31 @@ export default function Outcomes() {
   return (
     <div>
       {showChargeModal && <ChargeCapturModal onClose={() => setShowChargeModal(false)} />}
+
+      {tooltipPos && (
+        <div
+          className="fixed z-50 w-60 rounded-lg shadow-lg border border-[#E3E3E3] bg-white px-3 py-3 pointer-events-none"
+          style={{ top: tooltipPos.top, left: tooltipPos.left, transform: 'translateX(-50%)' }}
+        >
+          <p className="text-xs font-semibold text-[#2F2D2E] mb-1">Average variance items per case</p>
+          <p className="text-[11px] text-[#545F66] mb-2 leading-relaxed">How often a surgeon uses items that don't match their preference card — extra items, missing items, or wrong quantities.</p>
+          <div className="space-y-1">
+            {[
+              { dot: '#42A800', range: '< 0.7', label: 'card is well-maintained' },
+              { dot: '#F18F01', range: '0.7 – 1.4', label: 'some drift, worth reviewing' },
+              { dot: '#CB4630', range: '1.5+', label: 'significant drift, costing money' },
+            ].map(t => (
+              <div key={t.range} className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: t.dot }} />
+                <span className="text-[11px] text-[#545F66]">
+                  <span className="font-semibold text-[#2F2D2E]">{t.range}</span> — {t.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
@@ -576,26 +607,12 @@ export default function Outcomes() {
                 <span className="flex items-center gap-1">
                   Avg Variance Items
                   <SortIcon colKey="avgVarianceItems" />
-                  <span className="relative group ml-0.5">
-                    <Info size={11} className="cursor-help" style={{ color: '#C8CDD2' }} />
-                    <div className="absolute z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 rounded-lg shadow-lg border border-[#E3E3E3] bg-white px-3 py-3 text-left pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="text-xs font-semibold text-[#2F2D2E] mb-1.5">Average variance items per case</p>
-                      <p className="text-xs text-[#545F66] mb-2">How often a surgeon uses items that don't match their preference card — extra items, missing items, or wrong quantities.</p>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#42A800' }} />
-                          <span className="text-xs text-[#545F66]"><span className="font-semibold text-[#2F2D2E]">&lt; 0.7</span> — card is well-maintained</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#F18F01' }} />
-                          <span className="text-xs text-[#545F66]"><span className="font-semibold text-[#2F2D2E]">0.7 – 1.4</span> — some drift, worth reviewing</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#CB4630' }} />
-                          <span className="text-xs text-[#545F66]"><span className="font-semibold text-[#2F2D2E]">1.5+</span> — significant drift, costing money</span>
-                        </div>
-                      </div>
-                    </div>
+                  <span
+                    className="ml-0.5 cursor-help"
+                    onMouseEnter={showTooltip}
+                    onMouseLeave={() => setTooltipPos(null)}
+                  >
+                    <Info size={11} style={{ color: '#C8CDD2' }} />
                   </span>
                 </span>
               </th>
